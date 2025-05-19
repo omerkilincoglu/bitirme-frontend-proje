@@ -96,48 +96,54 @@ export default function CartScreen() {
   );
 
   const renderActiveItem = ({ item }) => (
-    <View style={styles.item}>
-      <View style={styles.row}>
-        <Image
-          source={{ uri: `http://10.7.85.158:3000/uploads/${item.resim}` }}
-          style={styles.imageThumb}
-        />
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.itemTitle}>{item.baslik}</Text>
-          <Text style={styles.itemPrice}>{item.fiyat} ₺</Text>
-          <Text style={styles.itemStatus}>Durum: Aktif</Text>
-        </View>
-        <View style={{ justifyContent: "center" }}>
-          <TouchableOpacity
-            style={[styles.operationButton, { backgroundColor: "#4CAF50" }]}
-            onPress={() => navigation.navigate("EditProduct", { id: item.id })}
-          >
-            <Ionicons name="create-outline" size={14} color="white" />
-            <Text style={styles.operationText}> Güncelle</Text>
-          </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("ProductDetail", { id: item.id })}
+    >
+      <View style={styles.item}>
+        <View style={styles.row}>
+          <Image
+            source={{ uri: `http://10.7.85.158:3000/uploads/${item.resim}` }}
+            style={styles.imageThumb}
+          />
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Text style={styles.itemTitle}>{item.baslik}</Text>
+            <Text style={styles.itemPrice}>{item.fiyat} ₺</Text>
+            <Text style={styles.itemStatus}>Durum: Aktif</Text>
+          </View>
+          <View style={{ justifyContent: "center" }}>
+            <TouchableOpacity
+              style={[styles.operationButton, { backgroundColor: "#4CAF50" }]}
+              onPress={() =>
+                navigation.navigate("EditProduct", { id: item.id })
+              }
+            >
+              <Ionicons name="create-outline" size={14} color="white" />
+              <Text style={styles.operationText}> Güncelle</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.operationButton, { backgroundColor: "#f44336" }]}
-            onPress={() =>
-              navigation.navigate("DeleteProduct", { id: item.id })
-            }
-          >
-            <Ionicons name="trash-outline" size={14} color="white" />
-            <Text style={styles.operationText}> Sil</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.operationButton, { backgroundColor: "#f44336" }]}
+              onPress={() =>
+                navigation.navigate("DeleteProduct", { id: item.id })
+              }
+            >
+              <Ionicons name="trash-outline" size={14} color="white" />
+              <Text style={styles.operationText}> Sil</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.operationButton, { backgroundColor: "#FF9800" }]}
-            onPress={() =>
-              navigation.navigate("RequestsScreen", { id: item.id })
-            }
-          >
-            <Ionicons name="document-text-outline" size={14} color="white" />
-            <Text style={styles.operationText}> Talepler</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.operationButton, { backgroundColor: "#FF9800" }]}
+              onPress={() =>
+                navigation.navigate("RequestsScreen", { id: item.id })
+              }
+            >
+              <Ionicons name="document-text-outline" size={14} color="white" />
+              <Text style={styles.operationText}> Talepler</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

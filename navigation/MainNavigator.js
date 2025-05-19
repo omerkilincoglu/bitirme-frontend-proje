@@ -18,6 +18,7 @@ import EditProductScreen from "../screens/EditProductScreen";
 import UpdateEmailScreen from "../screens/UpdateEmailScreen";
 import UpdatePasswordScreen from "../screens/UpdatePasswordScreen";
 import UpdateUsernameScreen from "../screens/UpdateUsernameScreen";
+import DeleteAccountScreen from "../screens/DeleteAccountScreen";
 import LanguageScreen from "../screens/LanguageScreen";
 import ProfileDetailScreen from "../screens/ProfileDetailScreen";
 import RequestsScreen from "../screens/RequestsScreen";
@@ -227,8 +228,14 @@ export default function MainNavigator() {
       <Stack.Screen
         name="ProfileDetail"
         component={ProfileDetailScreen}
-        options={{ title: "Bilgilerim" }}
+        options={{ title: "Kullanıcı Bilgileri" }}
       />
+      <Stack.Screen
+        name="DeleteAccount"
+        component={DeleteAccountScreen}
+        options={{ title: "Hesabımı Kapat" }}
+      />
+
       <Stack.Screen
         name="CancelSale"
         component={CancelSaleScreen}

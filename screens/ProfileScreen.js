@@ -132,6 +132,12 @@ export default function ProfileScreen() {
           onPress={() => navigation.navigate("UpdateEmail")}
         />
         <MenuItem
+          icon="trash-outline"
+          label="Hesabımı Kapat"
+          onPress={() => navigation.navigate("DeleteAccount")}
+        />
+
+        <MenuItem
           icon="log-out-outline"
           label="Çıkış Yap"
           color="red"

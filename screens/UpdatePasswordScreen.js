@@ -102,33 +102,45 @@ export default function UpdatePasswordScreen({ navigation }) {
         onPress={handlePasswordUpdate}
         disabled={loading}
       >
-        <Ionicons
-          name="lock-closed"
-          size={18}
-          color="white"
-          style={{ marginRight: 6 }}
-        />
-        <Text style={styles.buttonText}>Şifreyi Güncelle</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Ionicons
+            name="lock-closed"
+            size={18}
+            color="white"
+            style={{ marginRight: 6 }}
+          />
+          <Text style={styles.buttonText}>Şifreyi Güncelle</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF5EB", // favoriler ile aynı pastel açık zemin
+    padding: 20,
+  },
+
   label: {
     fontSize: 14,
     fontWeight: "bold",
     marginTop: 20,
-    color: colors.gray,
+    color: "#666",
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     fontSize: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
     color: colors.primaryText,
   },
+
   button: {
     marginTop: 40,
     backgroundColor: colors.primary,

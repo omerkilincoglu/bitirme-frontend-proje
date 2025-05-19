@@ -49,8 +49,6 @@ export default function ProfileDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Kullanıcı Bilgileri</Text>
-
       <View style={styles.card}>
         <Ionicons
           name="person-circle-outline"
@@ -75,30 +73,26 @@ export default function ProfileDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  container: { flex: 1, backgroundColor: "#FFF5EB", padding: 20 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.primaryText,
-    marginBottom: 16,
-  },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
-    padding: 14,
-    borderRadius: 12,
-    elevation: 1,
-    marginBottom: 16,
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#eee",
+    marginBottom: 14,
   },
+
   textBox: {
     marginLeft: 12,
     flex: 1,
   },
   label: {
     fontSize: 13,
-    color: colors.gray,
+    color: "#666",
   },
   value: {
     fontSize: 15,

@@ -53,40 +53,46 @@ export default function CartScreen() {
 
   // Sattıklarım ve Aldıklarım için renderItem
   const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <View style={styles.row}>
-        <Image
-          source={{
-            uri: `http://10.7.85.158:3000/uploads/${item.urun?.resim}`,
-          }}
-          style={styles.imageThumb}
-        />
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("ProductDetail", { id: item.urun?.id })
+      }
+    >
+      <View style={styles.item}>
+        <View style={styles.row}>
+          <Image
+            source={{
+              uri: `http://10.7.85.158:3000/uploads/${item.urun?.resim}`,
+            }}
+            style={styles.imageThumb}
+          />
 
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.itemTitle}>{item.urun?.baslik}</Text>
-          <Text style={styles.itemPrice}>{item.urun?.fiyat} ₺</Text>
-          <Text style={styles.itemStatus}>Durum: Satıldı</Text>
-          <Text style={styles.itemStatus}>
-            Alıcı: {item.alici?.kullaniciAdi}
-          </Text>
-        </View>
-
-        {/* 👉 BUTON SADECE SATTIKLARIMDA GÖRÜNSÜN */}
-        {activeTab === "sales" && (
-          <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
-            <TouchableOpacity
-              style={[styles.operationButton, { backgroundColor: "#f44336" }]}
-              onPress={() =>
-                navigation.navigate("CancelSale", { id: item.urun?.id })
-              }
-            >
-              <Ionicons name="close-circle-outline" size={14} color="white" />
-              <Text style={styles.operationText}> Satışı İptal</Text>
-            </TouchableOpacity>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Text style={styles.itemTitle}>{item.urun?.baslik}</Text>
+            <Text style={styles.itemPrice}>{item.urun?.fiyat} ₺</Text>
+            <Text style={styles.itemStatus}>Durum: Satıldı</Text>
+            <Text style={styles.itemStatus}>
+              Alıcı: {item.alici?.kullaniciAdi}
+            </Text>
           </View>
-        )}
+
+          {/* 👉 BUTON SADECE SATTIKLARIMDA GÖRÜNSÜN */}
+          {activeTab === "sales" && (
+            <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
+              <TouchableOpacity
+                style={[styles.operationButton, { backgroundColor: "#f44336" }]}
+                onPress={() =>
+                  navigation.navigate("CancelSale", { id: item.urun?.id })
+                }
+              >
+                <Ionicons name="close-circle-outline" size={14} color="white" />
+                <Text style={styles.operationText}> Satışı İptal</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderActiveItem = ({ item }) => (

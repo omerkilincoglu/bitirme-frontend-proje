@@ -1,5 +1,5 @@
 // CartScreen.js
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -27,7 +27,6 @@ export default function CartScreen() {
   const [sales, setSales] = useState([]);
   const [activeListings, setActiveListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const flatListRef = useRef();
 
   useEffect(() => {
     setLoading(true);
@@ -72,23 +71,24 @@ export default function CartScreen() {
           </Text>
         </View>
 
-        {/* 👉 SAĞDAKİ BUTONLAR BLOĞU */}
-        <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
-          <TouchableOpacity
-            style={[styles.operationButton, { backgroundColor: "#f44336" }]}
-            onPress={() =>
-              navigation.navigate("CancelSale", { id: item.urun?.id })
-            }
-          >
-            <Ionicons name="close-circle-outline" size={14} color="white" />
-            <Text style={styles.operationText}> Satışı İptal</Text>
-          </TouchableOpacity>
-        </View>
+        {/* 👉 BUTON SADECE SATTIKLARIMDA GÖRÜNSÜN */}
+        {activeTab === "sales" && (
+          <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
+            <TouchableOpacity
+              style={[styles.operationButton, { backgroundColor: "#f44336" }]}
+              onPress={() =>
+                navigation.navigate("CancelSale", { id: item.urun?.id })
+              }
+            >
+              <Ionicons name="close-circle-outline" size={14} color="white" />
+              <Text style={styles.operationText}> Satışı İptal</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
 
-  // Satışta Olanlar için renderActiveItem (SATIŞI İPTAL BUTONU ARTIK YOK)
   const renderActiveItem = ({ item }) => (
     <View style={styles.item}>
       <View style={styles.row}>
@@ -119,8 +119,6 @@ export default function CartScreen() {
             <Ionicons name="trash-outline" size={14} color="white" />
             <Text style={styles.operationText}> Sil</Text>
           </TouchableOpacity>
-
-          {/* ❌ Satışı İptal Et butonu BURADAN KALDIRILDI */}
 
           <TouchableOpacity
             style={[styles.operationButton, { backgroundColor: "#FF9800" }]}

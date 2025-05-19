@@ -242,11 +242,7 @@ export default function HomeScreen() {
                 size={24}
                 color={colors.primary}
               />
-              {bildirimSayisi > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{bildirimSayisi}</Text>
-                </View>
-              )}
+              {bildirimSayisi > 0 && <View style={styles.redDot} />}
             </TouchableOpacity>
           </View>
         </View>

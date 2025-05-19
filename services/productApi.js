@@ -77,7 +77,7 @@ export async function updateProduct(id, formData, token) {
   }
 }
 
-// ✅ Satıştaki Ürünler (GET /urun/satistaki)
+// ✅ Satıştaki Ürünler 
 export const getActiveListings = async (token) => {
   try {
     const response = await axios.get(`${API_URL}/urun/satistaki`, {
@@ -90,11 +90,11 @@ export const getActiveListings = async (token) => {
   }
 };
 
-// ✅ Satış Onayla (PUT /satilan/satista/:urunId)
-export async function confirmSale(productId, token) {
+// ✅ Talebi Onayla 
+export async function approveRequest(productId, token) {
   try {
     const res = await axios.put(
-      `${API_URL}/satilan/satista/${productId}`,
+      `${API_URL}/talep/onayla/${productId}`,
       {},
       {
         headers: {
@@ -105,21 +105,21 @@ export async function confirmSale(productId, token) {
     return { error: false, message: res.data.message };
   } catch (error) {
     console.error(
-      "Satış onaylama hatası:",
+      "Talep onaylama hatası:",
       error.response?.data || error.message
     );
     return {
       error: true,
-      message: error.response?.data?.mesaj || "Satış onaylanamadı.",
+      message: error.response?.data?.mesaj || "Talep onaylanamadı.",
     };
   }
 }
 
-// ✅ Satış İptal Et (PUT /satilan/iptal/:urunId)
+// ✅ Satış İptal Et 
 export async function cancelSale(productId, token) {
   try {
     const res = await axios.put(
-      `${API_URL}/satilan/iptal/${productId}`,
+      `${API_URL}/talep/iptal/${productId}`,
       {},
       {
         headers: {

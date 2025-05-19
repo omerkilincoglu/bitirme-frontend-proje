@@ -34,7 +34,6 @@ export default function RequestsScreen({ route }) {
       });
       setRequests(res.data.data || []);
     } catch (err) {
-      console.error("Talepler alınamadı:", err);
       Alert.alert("Hata", "Talepler yüklenemedi.");
     } finally {
       setLoading(false);
@@ -43,7 +42,7 @@ export default function RequestsScreen({ route }) {
 
   const handleRequestAction = async (urunId, action) => {
     try {
-      const url = `http://10.7.85.158:3000/api/satilan/${action}/${urunId}`;
+      const url = `http://10.7.85.158:3000/api/talep/${action}/${urunId}`;
       await axios.put(
         url,
         {},
@@ -55,7 +54,6 @@ export default function RequestsScreen({ route }) {
       );
       fetchRequests(); // Listeyi güncelle
     } catch (err) {
-      console.error("İşlem hatası:", err);
       Alert.alert("Hata", "İşlem gerçekleştirilemedi.");
     }
   };

@@ -196,13 +196,32 @@ export default function ProductDetailScreen({ navigation, route }) {
                       },
                       { headers: { Authorization: `Bearer ${token}` } }
                     );
+
                     Alert.alert(
                       "Talebiniz Gönderildi",
                       "Satıcı onaylarsa ürün sizin olacak."
                     );
                     fetchTalepDurumu();
                   } catch (err) {
-                    Alert.alert("Hata", "Satın alma talebi gönderilemedi.");
+                    const sunucuMesaji = err?.response?.data?.mesaj;
+
+                    if (sunucuMesaji?.includes("Zaten")) {
+                      Alert.alert("Uyarı", "Bu ürüne zaten talep gönderdiniz.");
+                    } else if (
+                      sunucuMesaji?.includes("Kendi ürününü alamazsın")
+                    ) {
+                      Alert.alert(
+                        "Uyarı",
+                        "Kendi ürününüze talep gönderemezsiniz."
+                      );
+                    } else if (sunucuMesaji?.includes("Ürün zaten satıldı")) {
+                      Alert.alert("Uyarı", "Bu ürün zaten satılmış.");
+                    } else {
+                      Alert.alert(
+                        "Hata",
+                        sunucuMesaji || "Satın alma talebi gönderilemedi."
+                      );
+                    }
                   }
                 }}
               >

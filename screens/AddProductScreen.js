@@ -52,6 +52,7 @@ export default function AddProductScreen() {
   const [ilce, setIlce] = useState("");
   const [ulke, setUlke] = useState("");
   const [loading, setLoading] = useState(false);
+  const [detayliKonum, setDetayliKonum] = useState("");
   const [showError, setShowError] = useState(false);
   const [imageError, setImageError] = useState("");
 
@@ -108,7 +109,8 @@ export default function AddProductScreen() {
       !ilce ||
       !ulke ||
       !image ||
-      !durum
+      !durum ||
+      !detayliKonum
     ) {
       setShowError(true);
       Alert.alert("Eksik bilgi", "Tüm alanlar zorunludur");
@@ -142,6 +144,7 @@ export default function AddProductScreen() {
       );
       formData.append("durum", durum);
       formData.append("konum", JSON.stringify({ il, ilce, ulke }));
+      formData.append("detayliKonum", detayliKonum);
       formData.append("resim", {
         uri: Platform.OS === "android" ? image : image.replace("file://", ""),
         name: filename,
@@ -335,12 +338,7 @@ export default function AddProductScreen() {
       </Modal>
 
       {/* KONUM */}
-      <TextInput
-        style={styles.input}
-        placeholder="İl"
-        value={il}
-        onChangeText={setIl}
-      />
+
       <TextInput
         style={styles.input}
         placeholder="İlçe"
@@ -349,9 +347,21 @@ export default function AddProductScreen() {
       />
       <TextInput
         style={styles.input}
+        placeholder="İl"
+        value={il}
+        onChangeText={setIl}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Ülke"
         value={ulke}
         onChangeText={setUlke}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Detaylı Konum (Cadde, Sokak, No, Daire)"
+        value={detayliKonum}
+        onChangeText={setDetayliKonum}
       />
 
       {/* GÖNDER BUTONU */}

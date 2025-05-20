@@ -13,8 +13,10 @@ import {
   Image,
   ActivityIndicator,
   Modal,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   Platform,
+  Keyboard,
   ScrollView as HorizontalScrollView,
 } from "react-native";
 import * as FileSystem from "expo-file-system";
@@ -187,7 +189,6 @@ export default function AddProductScreen() {
       setLoading(false);
     }
   };
-
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -236,46 +237,47 @@ export default function AddProductScreen() {
         )}
       </View>
 
-      <View style={styles.fieldContainer}>
+      {/* FORM */}
+      <View style={{ marginBottom: 12 }}>
         <Text style={styles.inlineLabel}>
           Ürün Adı <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={styles.input}
-          placeholder="ör. iPhone 13"
+          placeholder="iPhone 13"
           value={baslik}
           onChangeText={setBaslik}
         />
       </View>
 
-      <View style={styles.fieldContainer}>
+      <View style={{ marginBottom: 12 }}>
         <Text style={styles.inlineLabel}>
-          Açıklama <Text style={styles.required}>*</Text>
+          Ürün Açıklaması <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={[styles.input, styles.multiline]}
+          placeholder="Temiz kullanılmış, garantili"
           multiline
           numberOfLines={3}
-          placeholder="Temiz kullanılmış, garantili"
           value={aciklama}
           onChangeText={setAciklama}
         />
       </View>
 
-      <View style={styles.fieldContainer}>
+      <View style={{ marginBottom: 12 }}>
         <Text style={styles.inlineLabel}>
           Fiyat <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={styles.input}
-          placeholder="ör. 4999,99"
+          placeholder="199.99"
           keyboardType="decimal-pad"
           value={fiyat}
           onChangeText={setFiyat}
         />
       </View>
 
-      <View style={styles.fieldContainer}>
+      <View style={{ marginBottom: 12 }}>
         <Text style={styles.inlineLabel}>
           Kategori <Text style={styles.required}>*</Text>
         </Text>
@@ -286,17 +288,21 @@ export default function AddProductScreen() {
           <Text style={styles.durumValue}>{kategori || "Seç"}</Text>
           <Ionicons name="chevron-down" size={18} color={colors.gray} />
         </Pressable>
-        {kategori === "Diğer" && (
+      </View>
+
+      {kategori === "Diğer" && (
+        <View style={{ marginBottom: 12 }}>
+          <Text style={styles.inlineLabel}>Özel Kategori</Text>
           <TextInput
             style={styles.input}
             placeholder="Kategori girin"
             value={ozelKategori}
             onChangeText={setOzelKategori}
           />
-        )}
-      </View>
+        </View>
+      )}
 
-      <View style={styles.fieldContainer}>
+      <View style={{ marginBottom: 12 }}>
         <Text style={styles.inlineLabel}>
           Durum <Text style={styles.required}>*</Text>
         </Text>
@@ -305,10 +311,10 @@ export default function AddProductScreen() {
           onPress={() => setShowDurumModal(true)}
         >
           <Text style={styles.durumValue}>
-            {durum
-              ? durum === "azkullanılmış"
-                ? "Az Kullanılmış"
-                : "Yeni"
+            {durum === "azkullanılmış"
+              ? "Az Kullanılmış"
+              : durum === "yeni"
+              ? "Yeni"
               : "Seç"}
           </Text>
           <Ionicons name="chevron-down" size={18} color={colors.gray} />
@@ -360,6 +366,63 @@ export default function AddProductScreen() {
           <Text style={styles.buttonText}>Ürünü Ekle</Text>
         )}
       </Pressable>
+
+      {/* MODALLAR */}
+      <Modal visible={showKategoriModal} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowKategoriModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              {KATEGORILER.map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  onPress={() => {
+                    setKategori(item);
+                    setShowKategoriModal(false);
+                  }}
+                  style={[
+                    styles.modalOption,
+                    kategori === item && styles.modalOptionSelected,
+                  ]}
+                >
+                  <Text
+                    style={{ color: kategori === item ? "white" : colors.dark }}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <Modal visible={showDurumModal} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowDurumModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              {["azkullanılmış", "yeni"].map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  onPress={() => {
+                    setDurum(item);
+                    setShowDurumModal(false);
+                  }}
+                  style={[
+                    styles.modalOption,
+                    durum === item && styles.modalOptionSelected,
+                  ]}
+                >
+                  <Text
+                    style={{ color: durum === item ? "white" : colors.dark }}
+                  >
+                    {item === "azkullanılmış" ? "Az Kullanılmış" : "Yeni"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 }

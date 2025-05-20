@@ -59,9 +59,11 @@ export default function EditProductScreen() {
   const [il, setIl] = useState("");
   const [ilce, setIlce] = useState("");
   const [ulke, setUlke] = useState("");
+  const [detayliKonum, setDetayliKonum] = useState("");
 
   const [showDurumModal, setShowDurumModal] = useState(false);
   const [showKategoriModal, setShowKategoriModal] = useState(false);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -77,6 +79,14 @@ export default function EditProductScreen() {
         setIlce(urun.konum.ilce);
         setUlke(urun.konum.ulke);
         setImage(`http://10.7.85.158:3000/uploads/${urun.resim}`);
+
+        // ✅ tamAdres'ten detaylı kısmı ayır
+        if (urun.tamAdres) {
+          const parts = urun.tamAdres.split(" - ");
+          if (parts.length === 2) {
+            setDetayliKonum(parts[1]); // sadece "cadde sokak no" kısmını al
+          }
+        }
       } catch (err) {
         Alert.alert("Hata", "Ürün bilgisi getirilemedi.");
       } finally {
@@ -95,31 +105,41 @@ export default function EditProductScreen() {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true, // ✅ Çoklu seçim
+      selectionLimit: 6, // ✅ Maksimum 6
       quality: 0.7,
       allowsEditing: false,
     });
 
     if (!result.canceled && result.assets?.length > 0) {
-      const selected = result.assets[0];
-      try {
-        const fileInfo = await FileSystem.getInfoAsync(selected.uri);
-        if (!fileInfo.exists || !fileInfo.size) {
-          setImage(null);
-          Alert.alert("❌ Hata", "Dosya boyutu kontrol edilemedi.");
-          return;
-        }
+      const validImages = [];
 
-        if (fileInfo.size > 5 * 1024 * 1024) {
-          setImage(null);
-          Alert.alert("❌ Hata", "Fotoğraf 5MB'dan büyük olamaz.");
-          return;
-        }
+      for (const asset of result.assets) {
+        try {
+          const fileInfo = await FileSystem.getInfoAsync(asset.uri);
+          if (!fileInfo.exists || !fileInfo.size) {
+            Alert.alert("Hata", "Dosya kontrol edilemedi.");
+            continue;
+          }
 
-        setImage(selected.uri);
-      } catch (err) {
-        setImage(null);
-        Alert.alert("❌ Hata", "Dosya kontrolünde hata oluştu.");
+          if (fileInfo.size > 5 * 1024 * 1024) {
+            Alert.alert("❌ Hata", "Fotoğraf 5MB'dan büyük.");
+            continue;
+          }
+
+          validImages.push(asset.uri);
+        } catch {
+          Alert.alert("❌ Hata", "Dosya kontrolünde hata oluştu.");
+        }
       }
+
+      if (validImages.length === 0) {
+        Alert.alert("❌ Hata", "Geçerli bir fotoğraf seçilemedi.");
+        return;
+      }
+
+      // ✅ Toplam sayıyı kontrol et ve slice ile sınırla
+      setImages((prev) => [...prev, ...validImages].slice(0, 6)); // ❗️ 6 foto ile sınırla
     }
   };
 
@@ -133,7 +153,8 @@ export default function EditProductScreen() {
       !durum ||
       !il ||
       !ilce ||
-      !ulke
+      !ulke ||
+      !detayliKonum
     ) {
       setShowError(true);
       Alert.alert("Eksik bilgi", "Tüm alanlar zorunludur");
@@ -159,11 +180,12 @@ export default function EditProductScreen() {
       );
       formData.append("durum", durum);
       formData.append("konum", JSON.stringify({ il, ilce, ulke }));
+      formData.append("detayliKonum", detayliKonum); // ✅ EKLENDİ
 
       if (image && !image.includes("http")) {
         const filename = image.split("/").pop();
         const filetype = filename.split(".").pop();
-        formData.append("resim", {
+        formData.append("resimler", {
           uri: Platform.OS === "android" ? image : image.replace("file://", ""),
           name: filename,
           type: `image/${filetype}`,
@@ -236,78 +258,136 @@ export default function EditProductScreen() {
       </View>
 
       {/* FORM */}
-      <TextInput
-        style={styles.input}
-        placeholder="Ürün Adı"
-        value={baslik}
-        onChangeText={setBaslik}
-      />
-      <TextInput
-        style={[styles.input, styles.multiline]}
-        placeholder="Ürün Açıklaması"
-        multiline
-        numberOfLines={3}
-        value={aciklama}
-        onChangeText={setAciklama}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Fiyat (\u00f6r. 4999,99)"
-        keyboardType="decimal-pad"
-        value={fiyat}
-        onChangeText={setFiyat}
-      />
-
-      <Pressable
-        style={styles.durumSelector}
-        onPress={() => setShowKategoriModal(true)}
-      >
-        <Text style={styles.durumLabel}>Kategori</Text>
-        <Text style={styles.durumValue}>{kategori || "Seç"}</Text>
-        <Ionicons name="chevron-down" size={18} color={colors.gray} />
-      </Pressable>
-      {kategori === "Diğer" && (
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Ürün Adı <Text style={styles.required}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
-          placeholder="Kategori girin"
-          value={ozelKategori}
-          onChangeText={setOzelKategori}
+          placeholder="iPhone 13"
+          value={baslik}
+          onChangeText={setBaslik}
         />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Ürün Açıklaması <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, styles.multiline]}
+          placeholder="Temiz kullanılmış, garantili"
+          multiline
+          numberOfLines={3}
+          value={aciklama}
+          onChangeText={setAciklama}
+        />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Fiyat <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="199.99"
+          keyboardType="decimal-pad"
+          value={fiyat}
+          onChangeText={setFiyat}
+        />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Kategori <Text style={styles.required}>*</Text>
+        </Text>
+        <Pressable
+          style={styles.durumSelector}
+          onPress={() => setShowKategoriModal(true)}
+        >
+          <Text style={styles.durumValue}>{kategori || "Seç"}</Text>
+          <Ionicons name="chevron-down" size={18} color={colors.gray} />
+        </Pressable>
+      </View>
+
+      {kategori === "Diğer" && (
+        <View style={{ marginBottom: 12 }}>
+          <Text style={styles.inlineLabel}>Özel Kategori</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Kategori girin"
+            value={ozelKategori}
+            onChangeText={setOzelKategori}
+          />
+        </View>
       )}
 
-      <Pressable
-        style={styles.durumSelector}
-        onPress={() => setShowDurumModal(true)}
-      >
-        <Text style={styles.durumLabel}>Durum</Text>
-        <Text style={styles.durumValue}>
-          {durum
-            ? durum === "azkullanılmış"
-              ? "Az Kullanılmış"
-              : "Yeni"
-            : "Seç"}
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Durum <Text style={styles.required}>*</Text>
         </Text>
-        <Ionicons name="chevron-down" size={18} color={colors.gray} />
-      </Pressable>
+        <Pressable
+          style={styles.durumSelector}
+          onPress={() => setShowDurumModal(true)}
+        >
+          <Text style={styles.durumValue}>
+            {durum === "azkullanılmış"
+              ? "Az Kullanılmış"
+              : durum === "yeni"
+              ? "Yeni"
+              : "Seç"}
+          </Text>
+          <Ionicons name="chevron-down" size={18} color={colors.gray} />
+        </Pressable>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="İl"
-        value={il}
-        onChangeText={setIl}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="İlçe"
-        value={ilce}
-        onChangeText={setIlce}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Ülke"
-        value={ulke}
-        onChangeText={setUlke}
-      />
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          İl <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Gaziantep"
+          value={il}
+          onChangeText={setIl}
+        />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          İlçe <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nizip"
+          value={ilce}
+          onChangeText={setIlce}
+        />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Ülke <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Türkiye"
+          value={ulke}
+          onChangeText={setUlke}
+        />
+      </View>
+
+      <View style={{ marginBottom: 12 }}>
+        <Text style={styles.inlineLabel}>
+          Detaylı Adres <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Cadde, sokak, no..."
+          value={detayliKonum}
+          onChangeText={setDetayliKonum}
+        />
+      </View>
 
       <Pressable
         style={[styles.button, updating && { backgroundColor: "gray" }]}
@@ -386,6 +466,8 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: colors.background,
   },
+
+  // 📷 Fotoğraf alanı
   photoRow: {
     flexDirection: "row",
     marginBottom: 16,
@@ -423,17 +505,47 @@ const styles = StyleSheet.create({
     color: colors.gray,
     marginTop: 4,
   },
+
+  // 🏷️ Etiketler ve zorunlu alanlar
+  inlineLabel: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 2,
+    paddingLeft: 8,
+  },
+  required: {
+    color: "red",
+  },
+
+  // 🔤 Inputlar
+  input: {
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    fontSize: 15,
+    marginBottom: 8,
+  },
+  multiline: {
+    height: 80,
+    textAlignVertical: "top",
+  },
+
+  // 🔽 Seçim kutuları
   durumSelector: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: colors.white,
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.gray,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
   },
   durumLabel: {
     flex: 1,
@@ -446,31 +558,8 @@ const styles = StyleSheet.create({
     textAlign: "right",
     paddingRight: 10,
   },
-  input: {
-    backgroundColor: colors.white,
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 12,
-    fontSize: 16,
-    borderColor: colors.gray,
-    borderWidth: 1,
-  },
-  multiline: {
-    height: 90,
-    textAlignVertical: "top",
-  },
-  button: {
-    backgroundColor: "#4CAF50", // açık yeşil ton
-    padding: 16,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+
+  // 📦 Modal stilleri
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -491,10 +580,26 @@ const styles = StyleSheet.create({
   modalOptionSelected: {
     backgroundColor: colors.primary,
   },
+
+  // 📝 Bilgilendirme
   imageSizeInfo: {
     fontSize: 12,
     color: "#888",
     fontStyle: "italic",
     textAlign: "right",
+  },
+
+  // ✅ Buton
+  button: {
+    backgroundColor: "#4CAF50",
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

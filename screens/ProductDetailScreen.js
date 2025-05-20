@@ -1,5 +1,5 @@
 // ProductDetailScreen.js
-import React, { useEffect, useState, useContext } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Modal,
 } from "react-native";
 import axios from "axios";
+import { Dimensions } from "react-native";
 import { AuthContext } from "../store/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -21,6 +22,8 @@ import {
 } from "../services/favoriteApi";
 import colors from "../constants/colors";
 
+const screenWidth = Dimensions.get("window").width;
+
 export default function ProductDetailScreen({ navigation, route }) {
   const { user, token } = useContext(AuthContext);
   const { id } = route.params;
@@ -29,6 +32,10 @@ export default function ProductDetailScreen({ navigation, route }) {
   const [loading, setLoading] = useState(true);
   const [favoriId, setFavoriId] = useState(null);
   const [talepDurumu, setTalepDurumu] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isManualScroll, setIsManualScroll] = useState(false);
+  const scrollRef = useRef(null);
 
   const fetchProduct = async () => {
     try {
@@ -107,6 +114,19 @@ export default function ProductDetailScreen({ navigation, route }) {
   }, [id]);
 
   useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        x: currentIndex * screenWidth,
+        animated: true,
+      });
+
+      // Kaydırma tamamlandıktan sonra elle scroll kontrolünü kapat
+      const timeout = setTimeout(() => setIsManualScroll(false), 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex]);
+
+  useEffect(() => {
     if (product && product.saticiId && user && product.saticiId !== user.id) {
       fetchTalepDurumu();
     }
@@ -124,14 +144,41 @@ export default function ProductDetailScreen({ navigation, route }) {
     <>
       <ScrollView style={styles.container}>
         <View style={styles.imageContainer}>
-          <TouchableOpacity onPress={() => setImageModalVisible(true)}>
-            <Image
-              source={{
-                uri: `http://10.7.85.158:3000/uploads/${product.resim}`,
-              }}
-              style={styles.image}
-            />
-          </TouchableOpacity>
+          <ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={(e) => {
+              if (isManualScroll) return; // Scroll programatikse ignore et
+
+              const offsetX = e.nativeEvent.contentOffset.x;
+              const index = Math.round(offsetX / screenWidth);
+              if (index !== currentIndex) setCurrentIndex(index);
+            }}
+            scrollEventThrottle={16}
+          >
+            {(product.resimler?.length > 0
+              ? product.resimler
+              : [product.resim]
+            ).map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setCurrentIndex(index);
+                  setImageModalVisible(true);
+                }}
+              >
+                <Image
+                  source={{ uri: `http://10.7.85.158:3000/uploads/${img}` }}
+                  style={{ width: screenWidth, height: 300 }}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Favori ikonu */}
           <TouchableOpacity
             style={styles.favoriteIcon}
             onPress={toggleFavorite}
@@ -142,9 +189,47 @@ export default function ProductDetailScreen({ navigation, route }) {
               color="orange"
             />
           </TouchableOpacity>
+
+          {/* Durum etiketi */}
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{product.durum}</Text>
           </View>
+
+          {/* Sol-sağ oklar sadece çoklu görsellerde */}
+          {product.resimler?.length > 1 && (
+            <>
+              {currentIndex > 0 && (
+                <TouchableOpacity
+                  style={styles.leftArrow}
+                  onPress={() => {
+                    setIsManualScroll(true);
+                    setCurrentIndex(currentIndex - 1);
+                  }}
+                >
+                  <Ionicons
+                    name="chevron-back-circle"
+                    size={36}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              )}
+              {currentIndex < product.resimler.length - 1 && (
+                <TouchableOpacity
+                  style={styles.rightArrow}
+                  onPress={() => {
+                    setIsManualScroll(true);
+                    setCurrentIndex(currentIndex + 1);
+                  }}
+                >
+                  <Ionicons
+                    name="chevron-forward-circle"
+                    size={36}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              )}
+            </>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -158,11 +243,28 @@ export default function ProductDetailScreen({ navigation, route }) {
             <Ionicons name="pricetag" size={18} color={colors.gray} />
             <Text style={styles.meta}>{product.kategori}</Text>
           </View>
-          <View style={styles.sectionRow}>
+          <View
+            style={[
+              styles.sectionRow,
+              { alignItems: "flex-start", marginTop: 12 },
+            ]}
+          >
             <Ionicons name="location-outline" size={18} color={colors.gray} />
-            <Text style={styles.meta}>
-              {product.konum.il}, {product.konum.ulke}
-            </Text>
+            <View style={{ flex: 1, marginLeft: 6 }}>
+              <Text style={{ color: colors.primaryText, fontSize: 14 }}>
+                {product.tamAdres?.split(" - ")[1]?.trim() ||
+                  "Adres bulunamadı"}
+              </Text>
+              <Text
+                style={{
+                  color: colors.secondaryText,
+                  fontSize: 13,
+                  marginTop: 2,
+                }}
+              >
+                {product.konum.ilce} / {product.konum.il} / {product.konum.ulke}
+              </Text>
+            </View>
           </View>
 
           {user?.id !== product?.satici?.id && (
@@ -266,13 +368,25 @@ export default function ProductDetailScreen({ navigation, route }) {
           >
             <Ionicons name="close-circle" size={36} color="white" />
           </TouchableOpacity>
-          <Image
-            source={{
-              uri: `http://10.7.85.158:3000/uploads/${product.resim}`,
-            }}
-            style={styles.fullImage}
-            resizeMode="contain"
-          />
+
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: selectedImageIndex * screenWidth, y: 0 }}
+          >
+            {(product.resimler?.length > 0
+              ? product.resimler
+              : [product.resim]
+            ).map((img, idx) => (
+              <Image
+                key={idx}
+                source={{ uri: `http://10.7.85.158:3000/uploads/${img}` }}
+                style={{ width: screenWidth, height: "100%" }}
+                resizeMode="contain"
+              />
+            ))}
+          </ScrollView>
         </View>
       </Modal>
     </>
@@ -404,5 +518,18 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
     fontSize: 13,
+  },
+  leftArrow: {
+    position: "absolute",
+    top: "45%",
+    left: 16,
+    zIndex: 10,
+  },
+
+  rightArrow: {
+    position: "absolute",
+    top: "45%",
+    right: 16,
+    zIndex: 10,
   },
 });

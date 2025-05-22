@@ -17,7 +17,6 @@ export async function getProducts(filters = {}) {
     const response = await axios.get(`${API_URL}/urun`, { params });
     return response.data;
   } catch (error) {
-    console.error("Ürünleri alma hatası:", error);
     return { error: true, message: "Ürünler getirilemedi" };
   }
 }
@@ -33,10 +32,10 @@ export async function addProduct(formData, token) {
     });
     return response.data;
   } catch (error) {
-    console.error("Ürün ekleme hatası:", error.response?.data || error.message);
     return {
       error: true,
-      message: error.response?.data?.mesaj || "Ürün eklenemedi",
+      message:
+        error.response?.data?.mesaj || "Ürün eklenemedi. Lütfen tekrar deneyin",
     };
   }
 }
@@ -47,10 +46,8 @@ export async function deleteProduct(id, token) {
     const res = await axios.delete(`${API_URL}/urun/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
     return { error: false, message: res.data.mesaj };
   } catch (error) {
-    console.error("Ürün silme hatası:", error);
     return {
       error: true,
       message: error.response?.data?.mesaj || "Silme işlemi başarısız",
@@ -69,15 +66,11 @@ export async function updateProduct(id, formData, token) {
     });
     return response.data;
   } catch (error) {
-    console.error(
-      "Ürün güncelleme hatası:",
-      error.response?.data || error.message
-    );
     return { error: true, message: "Ürün güncellenemedi" };
   }
 }
 
-// ✅ Satıştaki Ürünler 
+// ✅ Satıştaki Ürünler
 export const getActiveListings = async (token) => {
   try {
     const response = await axios.get(`${API_URL}/urun/satistaki`, {
@@ -85,12 +78,11 @@ export const getActiveListings = async (token) => {
     });
     return response.data.urunler;
   } catch (error) {
-    console.error("Satıştaki ürünler alınamadı:", error);
     throw error;
   }
 };
 
-// ✅ Talebi Onayla 
+// ✅ Talebi Onayla
 export async function approveRequest(productId, token) {
   try {
     const res = await axios.put(
@@ -104,10 +96,6 @@ export async function approveRequest(productId, token) {
     );
     return { error: false, message: res.data.message };
   } catch (error) {
-    console.error(
-      "Talep onaylama hatası:",
-      error.response?.data || error.message
-    );
     return {
       error: true,
       message: error.response?.data?.mesaj || "Talep onaylanamadı.",
@@ -115,7 +103,7 @@ export async function approveRequest(productId, token) {
   }
 }
 
-// ✅ Satış İptal Et 
+// ✅ Satış İptal Et
 export async function cancelSale(productId, token) {
   try {
     const res = await axios.put(
@@ -129,10 +117,6 @@ export async function cancelSale(productId, token) {
     );
     return { error: false, message: res.data.message };
   } catch (error) {
-    console.error(
-      "Satış iptali hatası:",
-      error.response?.data || error.message
-    );
     return {
       error: true,
       message: error.response?.data?.mesaj || "Satış iptali başarısız.",

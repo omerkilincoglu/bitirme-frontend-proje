@@ -25,6 +25,7 @@ export default function NotificationsScreen({ navigation }) {
 
   const fetchBildirimler = async () => {
     setLoading(true);
+    setBildirimler([]);
     try {
       const res = await axios.get("http://10.7.85.158:3000/api/bildirim", {
         headers: { Authorization: `Bearer ${token}` },
@@ -139,8 +140,8 @@ export default function NotificationsScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      await fetchBildirimler();
       await isaretleOkunduHepsi();
+      await fetchBildirimler();
     });
 
     const blurListener = navigation.addListener("blur", () => {

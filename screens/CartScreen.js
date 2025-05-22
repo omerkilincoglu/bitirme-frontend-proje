@@ -12,7 +12,8 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { getMyPurchases, getMySales } from "../services/cartApi";
 import { getActiveListings } from "../services/productApi";
 import { AuthContext } from "../store/AuthContext";
@@ -28,28 +29,31 @@ export default function CartScreen() {
   const [activeListings, setActiveListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    const fetchData = async () => {
-      try {
-        if (activeTab === "purchases") {
-          const data = await getMyPurchases(token);
-          setPurchases(data);
-        } else if (activeTab === "sales") {
-          const data = await getMySales(token);
-          setSales(data);
-        } else if (activeTab === "active") {
-          const data = await getActiveListings(token);
-          setActiveListings(data);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          if (activeTab === "purchases") {
+            const data = await getMyPurchases(token);
+            setPurchases(data);
+          } else if (activeTab === "sales") {
+            const data = await getMySales(token);
+            setSales(data);
+          } else if (activeTab === "active") {
+            const data = await getActiveListings(token);
+            setActiveListings(data);
+          }
+        } catch (err) {
+          console.error("Veri çekme hatası:", err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Veri çekme hatası:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [activeTab, token]);
+      };
+
+      fetchData();
+    }, [activeTab, token])
+  );
 
   // Sattıklarım ve Aldıklarım için renderItem
   const renderItem = ({ item }) => (

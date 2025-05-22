@@ -48,11 +48,22 @@ export default function RequestsScreen({ route }) {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      setRequests((prev) =>
+        prev.map((req) =>
+          req.urunId === urunId
+            ? {
+                ...req,
+                durum: action === "onayla" ? "ONAYLANDI" : "REDDEDILDI",
+              }
+            : req
+        )
+      );
+
       Alert.alert(
         "Başarılı",
         `Talep ${action === "onayla" ? "onaylandı" : "reddedildi"}.`
       );
-      fetchRequests(); // Listeyi güncelle
     } catch (err) {
       Alert.alert("Hata", "İşlem gerçekleştirilemedi.");
     }

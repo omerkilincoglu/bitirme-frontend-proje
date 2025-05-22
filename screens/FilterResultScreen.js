@@ -1,3 +1,4 @@
+//FilterResultScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -74,14 +75,16 @@ export default function FilterResultScreen() {
   }
 
   return (
-    <FlatList
-      data={products}
-      keyExtractor={(item) => item.id.toString()}
-      numColumns={2}
-      columnWrapperStyle={{ justifyContent: "space-between" }}
-      contentContainerStyle={styles.listContent}
-      renderItem={renderItem}
-    />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={styles.listContent}
+        renderItem={renderItem}
+      />
+    </View>
   );
 }
 

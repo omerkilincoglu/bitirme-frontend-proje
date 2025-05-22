@@ -37,6 +37,7 @@ const KATEGORILER = [
   "Spor",
   "Oyuncak",
   "Saat",
+  "Masa",
   "Diğer",
 ];
 
@@ -166,7 +167,7 @@ export default function AddProductScreen() {
       // Sunucuya gönder
       const result = await addProduct(formData, token);
       if (!result.error) {
-        Alert.alert("Başarılı", "Ürün başarıyla eklendi!");
+        Alert.alert("Başarılı", "Ürün başarıyla eklendi ✅");
         // Formu sıfırla
         setImages([]);
         setBaslik("");
@@ -184,7 +185,6 @@ export default function AddProductScreen() {
       }
     } catch (err) {
       console.error(err);
-      Alert.alert("Sunucu Hatası", "Bağlantı kurulamadı.");
     } finally {
       setLoading(false);
     }
@@ -473,14 +473,13 @@ const styles = StyleSheet.create({
   // 📌 Etiket ve Alanlar
   fieldContainer: {
     marginBottom: 10,
-    paddingLeft: 10,
   },
   inlineLabel: {
     fontSize: 15,
     fontWeight: "500",
     color: "#333",
     marginBottom: 4,
-    paddingLeft: 8,
+    paddingLeft: 6,
   },
   required: {
     color: "red",

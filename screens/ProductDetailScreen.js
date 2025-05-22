@@ -512,8 +512,8 @@ const styles = StyleSheet.create({
     gap: 6,
     flex: 1,
     justifyContent: "center",
+    marginTop: 20,
   },
-
   actionButtonText: {
     color: "white",
     fontWeight: "600",

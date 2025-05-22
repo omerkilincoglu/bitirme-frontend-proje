@@ -1,5 +1,5 @@
 // Güncellenmiş HomeScreen.js - Favori işlemleri entegre ve veritabanına kayıt garantili
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import {
   View,
   Text,
@@ -47,6 +47,7 @@ export default function HomeScreen() {
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [bildirimSayisi, setBildirimSayisi] = useState(0);
   const [sohbetler, setSohbetler] = useState([]);
+  const debounceRef = useRef(null);
 
   const fetchFavorites = async () => {
     try {
@@ -83,6 +84,7 @@ export default function HomeScreen() {
   const fetchProducts = async (customFilters = null) => {
     setLoading(true);
     try {
+      // Eğer customFilters yoksa, varsayılan filtreleri kullan
       const filters = customFilters || {
         arama: searchQuery,
         kategori: selectedCategory,
@@ -116,7 +118,33 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
+    if (searchQuery.trim() === "") {
+      // Arama temizlenince tüm filtreler sıfırla
+      fetchProducts({
+        arama: "",
+        kategori: "",
+        durum: "",
+        minFiyat: "",
+        maxFiyat: "",
+      });
+    } else {
+      // Debounce ile arama yap
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        fetchProducts({
+          arama: searchQuery,
+          kategori: selectedCategory,
+          durum: selectedCondition,
+          minFiyat: minPrice,
+          maxFiyat: maxPrice,
+        });
+      }, 500);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      setSearchQuery(""); 
       fetchProducts();
       fetchFavorites();
       fetchBildirimSayisi();
@@ -214,7 +242,10 @@ export default function HomeScreen() {
               style={styles.searchInput}
               value={searchQuery}
               onChangeText={setSearchQuery}
+              onSubmitEditing={() => fetchProducts()} // ✅ EKLENDİ
+              returnKeyType="search" // ✅ EKLENDİ
             />
+
             <TouchableOpacity onPress={() => navigation.navigate("Filter")}>
               <Ionicons
                 name="options-outline"

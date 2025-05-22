@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import colors from "../constants/colors";
 
 const kategoriler = [
@@ -22,6 +23,7 @@ const kategoriler = [
   "Kitap",
   "Spor",
   "Oyuncak",
+  "Masa",
   "Saat",
 ];
 
@@ -31,6 +33,16 @@ export default function FilterScreen({ navigation }) {
   const [minFiyat, setMinFiyat] = useState("");
   const [maxFiyat, setMaxFiyat] = useState("");
   const [durum, setDurum] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      setSearch("");
+      setSelectedCategory(null);
+      setMinFiyat("");
+      setMaxFiyat("");
+      setDurum(null);
+    }, [])
+  );
 
   const applyFilters = () => {
     navigation.navigate("FilterResult", {

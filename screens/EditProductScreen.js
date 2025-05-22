@@ -19,7 +19,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import {
+  useRoute,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import axios from "axios";
 import colors from "../constants/colors";
 
@@ -36,12 +40,13 @@ const KATEGORILER = [
   "Spor",
   "Oyuncak",
   "Saat",
+  "Masa",
   "Diğer",
 ];
 
 export default function EditProductScreen() {
-  const route = useRoute();
   const navigation = useNavigation();
+  const route = useRoute();
   const { id } = route.params;
 
   const [showError, setShowError] = useState(false);
@@ -64,6 +69,14 @@ export default function EditProductScreen() {
   const [showDurumModal, setShowDurumModal] = useState(false);
   const [showKategoriModal, setShowKategoriModal] = useState(false);
   const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    if (route.params?.refresh) {
+      fetchProducts();
+      fetchFavorites();
+      fetchBildirimSayisi();
+    }
+  }, [route.params]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -173,6 +186,7 @@ export default function EditProductScreen() {
       const formData = new FormData();
       formData.append("baslik", baslik);
       formData.append("aciklama", aciklama);
+
       formData.append("fiyat", fiyat);
       formData.append(
         "kategori",
@@ -199,7 +213,7 @@ export default function EditProductScreen() {
         },
       });
 
-      Alert.alert("Başarılı", "Ürün güncellendi ✅");
+      Alert.alert("Başarılı", "Ürün başarıyla güncellendi ✅");
       navigation.goBack();
     } catch (err) {
       Alert.alert("Hata", err.response?.data?.mesaj || "Güncelleme başarısız");

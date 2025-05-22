@@ -192,6 +192,7 @@ export default function ChatListScreen({ navigation }) {
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.container}
+      style={{ backgroundColor: colors.background }} // ✅ bu satırı ekle
     />
   );
 }
@@ -199,13 +200,13 @@ export default function ChatListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: "#FFF3E9",
+    backgroundColor: colors.background,
   },
   loading: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFF3E9",
+    backgroundColor: colors.background,
   },
   chatItem: {
     backgroundColor: "white",

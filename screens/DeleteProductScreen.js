@@ -43,7 +43,7 @@ export default function DeleteProductScreen() {
   const handleDelete = async () => {
     const result = await deleteProduct(product.id, token);
     if (!result.error) {
-      Alert.alert("Silindi", "Ürün başarıyla silindi");
+      Alert.alert("Silindi", "Ürün başarıyla silindi ✅");
       navigation.goBack();
     } else {
       Alert.alert("Hata", result.message);
@@ -69,10 +69,7 @@ export default function DeleteProductScreen() {
         Bu ürünü silmek üzeresin. Devam etmek istiyor musun?
       </Text>
 
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={handleDelete}
-      >
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
         <Text style={styles.deleteText}>Evet, Sil</Text>
       </TouchableOpacity>
 

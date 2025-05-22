@@ -26,7 +26,6 @@ export default function CancelSaleScreen({ route, navigation }) {
       const res = await axios.get(`http://10.7.85.158:3000/api/urun/${id}`);
       setProduct(res.data.urun);
     } catch (err) {
-      console.log("ÜRÜN YÜKLEME HATASI:", err);
       Alert.alert("Hata", "Ürün bilgisi alınamadı.");
     } finally {
       setLoading(false);

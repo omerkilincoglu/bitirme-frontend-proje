@@ -167,7 +167,7 @@ export default function AddProductScreen() {
       // Sunucuya gönder
       const result = await addProduct(formData, token);
       if (!result.error) {
-        Alert.alert("Başarılı", "Ürün başarıyla eklendi ✅");
+        Alert.alert("🛒 Ürün Eklendi", "Ürününüz satışa hazır 🎯");
         // Formu sıfırla
         setImages([]);
         setBaslik("");

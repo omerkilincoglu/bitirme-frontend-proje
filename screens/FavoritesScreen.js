@@ -36,7 +36,7 @@ export default function FavoritesScreen({ navigation }) {
     try {
       await deleteFavorite(favoriId);
       setFavorites((prev) => prev.filter((item) => item.id !== favoriId));
-      Alert.alert("Favori kaldırıldı", "Ürün favorilerden çıkarıldı.");
+      Alert.alert("💔 Favori Silindi", "Bu ürün artık favorilerinizde değil.");
     } catch (err) {
       Alert.alert("Hata", "Favori silinemedi");
     }

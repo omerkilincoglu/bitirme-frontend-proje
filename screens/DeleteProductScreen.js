@@ -43,7 +43,7 @@ export default function DeleteProductScreen() {
   const handleDelete = async () => {
     const result = await deleteProduct(product.id, token);
     if (!result.error) {
-      Alert.alert("Silindi", "Ürün başarıyla silindi ✅");
+      Alert.alert("Silindi", "Ürün başarıyla silindi 🗑️");
       navigation.goBack();
     } else {
       Alert.alert("Hata", result.message);

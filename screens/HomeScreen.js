@@ -67,11 +67,17 @@ export default function HomeScreen() {
       if (fav) {
         await deleteFavorite(fav.id);
         console.log("Favori silindi:", urunId);
-        Alert.alert("Favori Kaldırıldı", "Ürün favorilerden çıkarıldı.");
+        Alert.alert(
+          "💔 Favori Silindi",
+          "Bu ürün artık favorilerinizde değil."
+        );
       } else {
         const res = await addFavorite(urunId);
         console.log("Favori eklendi:", res);
-        Alert.alert("Favori Eklendi", "Ürün favorilere eklendi.");
+        Alert.alert(
+          "💖 Favoriye Eklendi",
+          "Bu ürünü favoriler arasında saklıyoruz!"
+        );
       }
 
       await fetchFavorites();
@@ -144,7 +150,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      setSearchQuery(""); 
+      setSearchQuery("");
       fetchProducts();
       fetchFavorites();
       fetchBildirimSayisi();

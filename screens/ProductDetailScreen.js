@@ -75,11 +75,17 @@ export default function ProductDetailScreen({ navigation, route }) {
       if (favoriId) {
         await deleteFavorite(favoriId);
         setFavoriId(null);
-        Alert.alert("Favori Kaldırıldı", "Ürün favorilerden çıkarıldı.");
+        Alert.alert(
+          "💔 Favori Silindi",
+          "Bu ürün artık favorilerinizde değil."
+        );
       } else {
         const result = await addFavorite(parseInt(id));
         setFavoriId(result.favori.id);
-        Alert.alert("Favori Eklendi", "Ürün favorilere eklendi.");
+        Alert.alert(
+          "💖 Favoriye Eklendi",
+          "Bu ürünü favoriler arasında saklıyoruz!"
+        );
       }
     } catch (err) {
       Alert.alert("Hata", "Favori işlemi başarısız oldu.");
@@ -300,9 +306,10 @@ export default function ProductDetailScreen({ navigation, route }) {
                     );
 
                     Alert.alert(
-                      "Talebiniz Gönderildi",
-                      "Satıcı onaylarsa ürün sizin olacak."
+                      "📩 Talebiniz Gönderildi",
+                      "Satıcı onaylarsa ürün sizin olacak! 🤝"
                     );
+
                     fetchTalepDurumu();
                   } catch (err) {
                     const sunucuMesaji = err?.response?.data?.mesaj;
@@ -344,11 +351,22 @@ export default function ProductDetailScreen({ navigation, route }) {
                     );
                     Alert.alert(
                       "Talep İptal Edildi",
-                      "Satın alma talebiniz iptal edildi."
+                      "Satın alma talebiniz başarıyla iptal edildi. 🗑️"
                     );
                     fetchTalepDurumu();
                   } catch (err) {
-                    Alert.alert("Hata", "Talep iptal edilemedi.");
+                    let mesaj = "Bilinmeyen bir hata oluştu. 😕";
+
+                    // Backend'den gelen mesaj varsa onu kullan
+                    if (
+                      err.response &&
+                      err.response.data &&
+                      err.response.data.mesaj
+                    ) {
+                      mesaj = err.response.data.mesaj + " 🤷‍♂️";
+                    }
+
+                    Alert.alert("Talep İptal Edilemedi", mesaj);
                   }
                 }}
               >

@@ -213,7 +213,7 @@ export default function EditProductScreen() {
         },
       });
 
-      Alert.alert("Başarılı", "Ürün başarıyla güncellendi ✅");
+      Alert.alert("🎯 Güncellendi", "Ürün bilgileri başarıyla kaydedildi!");
       navigation.goBack();
     } catch (err) {
       Alert.alert("Hata", err.response?.data?.mesaj || "Güncelleme başarısız");

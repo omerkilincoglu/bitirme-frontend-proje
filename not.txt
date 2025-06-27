@@ -1,0 +1,1159 @@
+// ChatScreen.js
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useLayoutEffect,
+} from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { AuthContext } from "../store/AuthContext";
+import {
+  getChatMessages,
+  sendMessageByChatId,
+  sendMessage,
+} from "../services/messageApi";
+import axios from "axios";
+import colors from "../constants/colors";
+import EmptyState from "../components/EmptyState";
+
+// Hazır mesajları satırlara bölen yardımcı fonksiyon
+function chunkArray(array, size) {
+  const chunked = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunked.push(array.slice(i, i + size));
+  }
+  return chunked;
+}
+
+export default function ChatScreen({ route, navigation }) {
+  const {
+    sohbetId: initialSohbetId = null,
+    urunId,
+    karsiTarafAdi,
+    karsiTarafAvatar,
+  } = route.params;
+  const [sohbetId, setSohbetId] = useState(initialSohbetId || null);
+  const { token, user } = useContext(AuthContext);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [input, setInput] = useState("");
+  const flatListRef = useRef();
+  const [aktifUrun, setAktifUrun] = useState(null);
+
+  const quickReplies = [
+    "Merhaba, teklifte bulunmak istiyorum.",
+    "Ürün hâlâ satılık mı?",
+    "Fiyatta pazarlık olur mu?",
+    "Detaylı bilgi alabilir miyim?",
+  ];
+
+  useLayoutEffect(() => {
+    if (karsiTarafAdi && karsiTarafAvatar) {
+      navigation.setOptions({
+        headerTitle: () => (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              source={{ uri: karsiTarafAvatar }}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                marginRight: 8,
+                backgroundColor: "#ccc",
+              }}
+            />
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              {karsiTarafAdi}
+            </Text>
+          </View>
+        ),
+      });
+    }
+  }, [navigation, karsiTarafAdi, karsiTarafAvatar]);
+
+  useEffect(() => {
+    const fetchUrun = async () => {
+      try {
+        const res = await axios.get(
+          `http://:3000/api/urun/${urunId}`
+        );
+        setAktifUrun(res.data.urun);
+      } catch (err) {
+        console.log("Ürün bilgisi alınamadı:", err);
+      }
+    };
+    if (urunId) {
+      fetchUrun();
+    }
+  }, [urunId]);
+
+  useEffect(() => {
+    if (sohbetId) {
+      const timeout = setTimeout(() => {
+        fetchMessages();
+        markMessagesAsRead();
+      }, 300);
+      return () => clearTimeout(timeout);
+    } else {
+      setLoading(false); // ✅ sohbetId yoksa da loading kapanmalı
+    }
+  }, [sohbetId]);
+
+  const scrollToEnd = () => {
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
+  const fetchMessages = async () => {
+    if (!sohbetId) {
+      setLoading(false); // sohbet yoksa bile loading kapatılmalı
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await getChatMessages(sohbetId, token);
+
+      if (result.success && Array.isArray(result.data)) {
+        setMessages(result.data);
+
+        // ilk mesajlardan birinde ürün varsa, aktif ürünü set et
+        const urunluMesaj = result.data.find((msg) => msg.urun);
+        if (urunluMesaj) {
+          setAktifUrun(urunluMesaj.urun);
+        }
+      } else {
+        setMessages([]);
+      }
+
+      scrollToEnd();
+    } catch (error) {
+      console.log("❌ fetchMessages error:", error);
+      setMessages([]);
+    } finally {
+      setLoading(false); // hata olsa bile loading kapanmalı
+    }
+  };
+
+  const markMessagesAsRead = async () => {
+    try {
+      await axios.put(
+        `http://:3000/api/mesaj/okundu/${sohbetId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.log("Okundu güncelleme hatası:", err);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    let result;
+
+    if (sohbetId) {
+      result = await sendMessageByChatId(sohbetId, input, urunId, token);
+
+      if (!result.success) {
+        result = await sendMessage(urunId, input, token);
+        if (result.success) {
+          setSohbetId(result.sohbetId);
+        }
+      }
+    } else {
+      result = await sendMessage(urunId, input, token);
+      if (result.success) {
+        setSohbetId(result.sohbetId);
+      }
+    }
+
+    if (result.success && result.data) {
+      // ✅ Sadece ilk mesajda ürün bilgisini al
+      if (result.data.urun && messages.length === 0) {
+        setAktifUrun(result.data.urun);
+      }
+
+      setMessages((prev) => [...prev, result.data]);
+      setInput("");
+      scrollToEnd();
+    } else {
+      Alert.alert("Hata", result.message || "Mesaj gönderilemedi.");
+    }
+  };
+
+  const renderMessage = ({ item, index }) => {
+    const isMine = item.gondericiId === user.id;
+
+    const isFirstForThisProduct =
+      messages.findIndex((msg) => msg.urunId === item.urunId) === index;
+
+    return (
+      <View
+        style={[
+          styles.messageWrapper,
+          isMine ? styles.alignRight : styles.alignLeft,
+        ]}
+      >
+        <View
+          style={[
+            styles.messageBubble,
+            isMine ? styles.myMessage : styles.theirMessage,
+          ]}
+        >
+          {/* 🔥 Her ürün için sadece ilk mesajda göster */}
+          {item.urun && isFirstForThisProduct && (
+            <View style={styles.productCard}>
+              <Image
+                source={{
+                  uri: `http://:3000/uploads/${item.urun.resim}`,
+                }}
+                style={styles.productImage}
+              />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={styles.productTitle}>{item.urun.baslik}</Text>
+                <Text style={styles.productPrice}>{item.urun.fiyat} ₺</Text>
+              </View>
+            </View>
+          )}
+
+          <Text style={styles.messageText}>{item.mesaj}</Text>
+
+          <View style={styles.metaInfo}>
+            <Text style={styles.timeText}>
+              {item.zaman ? item.zaman.slice(11, 16) : ""}
+            </Text>
+            {isMine && (
+              <Ionicons
+                name={item.okundu ? "checkmark-done" : "checkmark"}
+                size={14}
+                color={item.okundu ? "#4CAF50" : "#999"}
+                style={{ marginLeft: 6 }}
+              />
+            )}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={90}
+    >
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <>
+          {/* Genel ürün bilgisi üstte (sohbetin başında gösterilir) */}
+          {aktifUrun && (
+            <View style={styles.aktifUrunContainer}>
+              <Image
+                source={{
+                  uri: `http://:3000/uploads/${aktifUrun.resim}`,
+                }}
+                style={styles.aktifUrunImage}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.aktifUrunTitle}>{aktifUrun.baslik}</Text>
+                <Text style={styles.aktifUrunFiyat}>{aktifUrun.fiyat} ₺</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Mesaj listesi veya boş durumu */}
+          {messages.length === 0 ? (
+            <EmptyState
+              icon="chatbubbles-outline"
+              title="Henüz mesaj yok"
+              message="Bu sohbette henüz hiç mesajlaşma yapılmamış."
+            />
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              extraData={messages}
+              renderItem={renderMessage}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.listContent}
+              onContentSizeChange={() =>
+                flatListRef.current?.scrollToEnd({ animated: true })
+              }
+            />
+          )}
+        </>
+      )}
+
+      {/* Hızlı mesajlar */}
+      <View style={styles.quickReplyContainer}>
+        {chunkArray(quickReplies, 2).map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.quickReplyRow}>
+            {row.map((item, colIndex) => (
+              <TouchableOpacity
+                key={colIndex}
+                onPress={() => setInput(item)}
+                style={styles.quickReplyButton}
+              >
+                <Text style={styles.quickReplyText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </View>
+
+      {/* Mesaj yazma alanı */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Mesaj yaz..."
+          value={input}
+          onChangeText={setInput}
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+          <Ionicons name="send" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF8F0",
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF8F0",
+  },
+  listContent: {
+    padding: 12,
+  },
+  messageWrapper: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  alignRight: {
+    justifyContent: "flex-end",
+  },
+  alignLeft: {
+    justifyContent: "flex-start",
+  },
+  messageBubble: {
+    maxWidth: "75%",
+    padding: 10,
+    borderRadius: 16,
+  },
+  myMessage: {
+    backgroundColor: "#FFE0C2",
+    alignSelf: "flex-end",
+    borderTopRightRadius: 0,
+  },
+  theirMessage: {
+    backgroundColor: "#ECECEC",
+    alignSelf: "flex-start",
+    borderTopLeftRadius: 0,
+  },
+  messageText: {
+    color: "#000",
+    fontSize: 14,
+  },
+  metaInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    marginTop: 4,
+  },
+  timeText: {
+    fontSize: 10,
+    color: "#666",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    backgroundColor: "#fff",
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: "#f1f1f1",
+  },
+  sendButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    padding: 10,
+    marginLeft: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  quickReplyContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  quickReplyRow: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+    marginBottom: 8,
+  },
+  quickReplyButton: {
+    backgroundColor: "#f1f1f1",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 10,
+    marginBottom: 6,
+    maxWidth: "48%",
+  },
+  quickReplyText: {
+    fontSize: 13,
+    color: "#333",
+  },
+  productCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 6,
+    borderColor: "#ddd",
+    borderWidth: 1,
+  },
+
+  productImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 4,
+  },
+
+  productTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#333",
+  },
+
+  productPrice: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+});
+
+
+
+
+
+**********************************************************************************************************************************************************
+//ProductDetailScreen.js
+import React, { useEffect, useState, useContext } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
+import axios from "axios";
+import { AuthContext } from "../store/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  addFavorite,
+  deleteFavorite,
+  getFavorites,
+} from "../services/favoriteApi";
+import { sendMessage } from "../services/messageApi";
+import colors from "../constants/colors";
+
+export default function ProductDetailScreen({ navigation, route }) {
+  const { user, token } = useContext(AuthContext);
+  const { id } = route.params;
+  const [isImageModalVisible, setImageModalVisible] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [favoriId, setFavoriId] = useState(null);
+  const [canBuy, setCanBuy] = useState(false);
+
+  const fetchProduct = async () => {
+    try {
+      const res = await axios.get(`http://:3000/api/urun/${id}`);
+      setProduct(res.data.urun);
+    } catch (err) {
+      Alert.alert("Hata", "Ürün detay hatası");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkFavorite = async () => {
+    try {
+      const list = await getFavorites();
+      const fav = list.find((f) => f.urunId === parseInt(id));
+      if (fav) setFavoriId(fav.id);
+    } catch (err) {
+      console.log("Favori kontrol hatası", err);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    try {
+      if (favoriId) {
+        await deleteFavorite(favoriId);
+        setFavoriId(null);
+        Alert.alert("Favori Kaldırıldı", "Ürün favorilerden çıkarıldı.");
+      } else {
+        const result = await addFavorite(parseInt(id));
+        setFavoriId(result.favori.id);
+        Alert.alert("Favori Eklendi", "Ürün favorilere eklendi.");
+      }
+    } catch (err) {
+      Alert.alert("Hata", "Favori işlemi başarısız oldu.");
+    }
+  };
+
+    const checkIfChatHasMessage = async () => {
+    try {
+      const sohbetRes = await axios.get(`http://:3000/api/sohbet`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const sohbet = sohbetRes.data.sohbetler.find(
+        (s) => s.urun.id === id && s.karsiTaraf.id === product.saticiId
+      );
+
+      if (sohbet && sohbet.sonMesaj) {
+        setMesajAtildi(true); // uyumlu olacak şekilde tekrar aktif
+      } else {
+        setMesajAtildi(false);
+      }
+    } catch (err) {
+      console.log("Sohbet kontrol hatası:", err);
+    }
+  };
+  const goToChat = async () => {
+    try {
+      const sohbetRes = await axios.get(`http://:3000/api/sohbet`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const sohbet = sohbetRes.data.sohbetler.find(
+        (s) => s.karsiTaraf.id === product.saticiId
+      );
+
+      if (sohbet) {
+        navigation.navigate("ChatScreen", {
+          urunId: product.id,
+          sohbetId: sohbet.id,
+          karsiTarafAdi: product.satici?.kullaniciAdi,
+          karsiTarafAvatar: product.satici?.avatar || null,
+        });
+      } else {
+        navigation.navigate("ChatScreen", {
+          urunId: product.id,
+          sohbetId: null, // yeni sohbet ChatScreen içinde açılacak
+          karsiTarafAdi: product.satici?.kullaniciAdi,
+          karsiTarafAvatar: product.satici?.avatar || null,
+        });
+      }
+    } catch (err) {
+      console.log("Sohbet kontrol hatası:", err);
+      Alert.alert("Hata", "Sohbet alınamadı.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProduct();
+    checkFavorite();
+  }, [id]);
+
+  useEffect(() => {
+    if (product && user && product.saticiId !== user.id) {
+      checkIfChatHasMessage();
+    }
+  }, [product]);
+
+  if (loading || !product) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <ScrollView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+            <Image
+              source={{
+                uri: `http://:3000/uploads/${product.resim}`,
+              }}
+              style={styles.image}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.favoriteIcon}
+            onPress={toggleFavorite}
+          >
+            <Ionicons
+              name={favoriId ? "heart" : "heart-outline"}
+              size={18}
+              color="orange"
+            />
+          </TouchableOpacity>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{product.durum}</Text>
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.title}>{product.baslik}</Text>
+          <Text style={styles.price}>{product.fiyat} ₺</Text>
+          <Text style={styles.label}>Açıklama</Text>
+          <View style={styles.descBox}>
+            <Text style={styles.description}>{product.aciklama}</Text>
+          </View>
+          <View style={styles.sectionRow}>
+            <Ionicons name="pricetag" size={18} color={colors.gray} />
+            <Text style={styles.meta}>{product.kategori}</Text>
+          </View>
+          <View style={styles.sectionRow}>
+            <Ionicons name="location-outline" size={18} color={colors.gray} />
+            <Text style={styles.meta}>
+              {product.konum.il}, {product.konum.ulke}
+            </Text>
+          </View>
+
+          {user?.id !== product?.satici?.id && (
+            <View style={{ flexDirection: "row", marginTop: 20, gap: 10 }}>
+              <TouchableOpacity style={styles.offerButton} onPress={goToChat}>
+                <Text style={styles.offerText}>Teklif Ver</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={!canBuy}
+                style={[
+                  styles.offerButton,
+                  { backgroundColor: canBuy ? colors.primary : "#ccc" },
+                ]}
+                onPress={() => {
+                  if (canBuy) {
+                    navigation.navigate("PurchaseScreen", {
+                      urunId: product.id,
+                    });
+                  }
+                }}
+              >
+                <Text
+                  style={{
+                    color: canBuy ? colors.white : "#666",
+                    fontWeight: "600",
+                    fontSize: 16,
+                  }}
+                >
+                  Satın Al
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+      <Modal visible={isImageModalVisible} transparent={true}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setImageModalVisible(false)}
+          >
+            <Ionicons name="close-circle" size={36} color="white" />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: `http://:3000/uploads/${product.resim}` }}
+            style={styles.fullImage}
+            resizeMode="contain"
+          />
+        </View>
+      </Modal>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background,
+  },
+  imageContainer: {
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: 300,
+  },
+  favoriteIcon: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "white",
+    padding: 6,
+    borderRadius: 20,
+    elevation: 3,
+    zIndex: 2,
+  },
+  badge: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    backgroundColor: "orange",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  badgeText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  content: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: colors.primaryText,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: colors.primary,
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  descBox: {
+    backgroundColor: "#f5f5f5",
+    padding: 12,
+    borderRadius: 10,
+  },
+  description: {
+    fontSize: 14,
+    color: colors.secondaryText,
+  },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  meta: {
+    fontSize: 14,
+    color: colors.dark,
+    marginLeft: 6,
+  },
+  offerButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  offerText: {
+    color: colors.white,
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 2,
+  },
+  fullImage: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "black",
+  },
+});
+
+
+
+**********************************************************************************************************************************************************
+// 📄 messageApi.js
+import axios from "axios";
+
+const API_URL = "http://:3000/api";
+
+/**
+ * 📨 Belirli sohbetin mesajlarını getirir
+ */
+export async function getChatMessages(sohbetId, token) {
+  try {
+    const response = await axios.get(`${API_URL}/mesaj/${sohbetId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return {
+      success: true,
+      data: response.data.mesajlar || [],
+    };
+  } catch (error) {
+    console.error("❌ Mesajlar alınamadı:", error);
+    return {
+      success: false,
+      message: "Mesajlar alınamadı",
+    };
+  }
+}
+
+/**
+ * ✉️ Yeni sohbet başlatır ve ilk mesajı gönderir
+ */
+export async function sendMessage(urunId, mesaj, token) {
+  console.log("📤 Yeni mesaj gönderiliyor:", { urunId, mesaj });
+
+  try {
+    const response = await axios.post(
+      `${API_URL}/mesaj/gonder`,
+      { urunId, mesaj },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return {
+      success: true,
+      data: response.data.veri,
+      sohbetId: response.data.sohbetId,
+    };
+  } catch (error) {
+    console.error("❌ Yeni sohbet mesaj gönderme hatası:", error);
+    return {
+      success: false,
+      message:
+        error?.response?.data?.mesaj ||
+        "Yeni sohbet sırasında mesaj gönderilemedi.",
+    };
+  }
+}
+
+/**
+ * ✅ Mevcut sohbetin mesajlarını okundu olarak işaretler
+ */
+export async function markMessagesAsRead(sohbetId, token) {
+  try {
+    await axios.put(
+      `${API_URL}/mesaj/okundu/${sohbetId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Okundu güncelleme hatası:", error);
+    return { success: false };
+  }
+}
+
+/**
+ * 💬 Var olan bir sohbete mesaj gönderir
+ * (Bu eksikti, eklendi!)
+ */
+export async function sendMessageByChatId(sohbetId, mesaj, token) {
+  try {
+    const response = await axios.post(
+      `${API_URL}/mesaj/sohbet/${sohbetId}`,
+      { mesaj },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return {
+      success: true,
+      data: response.data.veri,
+    };
+  } catch (error) {
+    console.error("❌ Mevcut sohbete mesaj gönderilemedi:", error);
+    return {
+      success: false,
+      message:
+        error?.response?.data?.mesaj || "Mevcut sohbete mesaj gönderilemedi.",
+    };
+  }
+}
+
+
+**********************************************************************************************************************************************************
+// ✅ Tertemiz ve uyumlu mesaj.js — ChatScreen ile %100 uyumlu, tekrar yok, ID hataları engellenmiş
+const express = require("express");
+const prisma = require("../utils/prisma");
+const authMiddleware = require("../middlewares/authMiddleware");
+const ApiError = require("../utils/ApiError");
+
+const router = express.Router();
+
+// ✉️ Mesaj gönder (ürünId ile - ilk mesaj veya sohbet yoksa)
+router.post("/gonder", authMiddleware, async (req, res, next) => {
+  try {
+    const { urunId, mesaj } = req.body;
+    const gondericiId = req.kullanici.id;
+
+    if (!urunId || !mesaj?.trim()) {
+      throw new ApiError("Ürün ID ve mesaj zorunludur.", 422);
+    }
+
+    const urun = await prisma.urun.findUnique({
+      where: { id: urunId },
+      include: { satici: true },
+    });
+
+    if (!urun) throw new ApiError("Ürün bulunamadı.", 404);
+
+    let sohbet = await prisma.sohbet.findFirst({
+      where: {
+        OR: [
+          { aliciId: gondericiId, saticiId: urun.saticiId },
+          { aliciId: urun.saticiId, saticiId: gondericiId },
+        ],
+      },
+    });
+
+    if (!sohbet && urun.saticiId === gondericiId) {
+      throw new ApiError("Kendi ürününüze mesaj atamazsınız.", 403);
+    }
+
+    if (!sohbet) {
+      sohbet = await prisma.sohbet.create({
+        data: {
+          urunId,
+          aliciId: gondericiId,
+          saticiId: urun.saticiId,
+        },
+      });
+      console.log("Sohbet oluşturuldu:", sohbet);
+    }
+
+    const yeniMesaj = await prisma.mesaj.create({
+      data: {
+        sohbetId: sohbet.id,
+        mesaj,
+        gondericiId,
+        okundu: false,
+      },
+    });
+
+    console.log("Yeni mesaj oluşturuldu:", yeniMesaj);
+
+    const tumMesajlar = await prisma.mesaj.findMany({
+      where: { sohbetId: sohbet.id },
+      select: { gondericiId: true },
+      distinct: ["gondericiId"],
+    });
+
+    if (tumMesajlar.length >= 2) {
+      const talepVarMi = await prisma.satisTalebi.findFirst({
+        where: {
+          urunId,
+          aliciId: gondericiId,
+        },
+      });
+
+      if (!talepVarMi) {
+        await prisma.satisTalebi.create({
+          data: {
+            urunId,
+            aliciId: gondericiId,
+            mesaj: "Karşılıklı mesajlaşma sonrası otomatik talep oluşturuldu.",
+            durum: "BEKLIYOR",
+          },
+        });
+      }
+    }
+
+    const gonderen = await prisma.kullanici.findUnique({
+      where: { id: gondericiId },
+    });
+
+    await prisma.bildirim.create({
+      data: {
+        mesaj: `${gonderen.kullaniciAdi} size bir mesaj gönderdi.`,
+        hedefId:
+          sohbet.saticiId === gondericiId ? sohbet.aliciId : sohbet.saticiId,
+      },
+    });
+
+    res.status(201).json({
+      mesaj: "Mesaj gönderildi ✅",
+      veri: yeniMesaj,
+      sohbetId: sohbet.id,
+    });
+  } catch (hata) {
+    next(hata);
+  }
+});
+
+// 📨 Belirli bir sohbete ait mesajları getir (ChatScreen ile uyumlu)
+router.get("/:sohbetId", authMiddleware, async (req, res, next) => {
+  console.log("📥 Backend aldı ID:", req.params.sohbetId);
+  try {
+    const sohbetIdRaw = req.params.sohbetId;
+    const sohbetId = Number(sohbetIdRaw);
+    const kullaniciId = req.kullanici.id;
+
+    if (!sohbetIdRaw || isNaN(sohbetId) || sohbetId <= 0) {
+      return res.status(400).json({ mesaj: "Geçersiz sohbet ID." });
+    }
+
+    const sohbet = await prisma.sohbet.findFirst({
+      where: {
+        id: sohbetId,
+        OR: [{ aliciId: kullaniciId }, { saticiId: kullaniciId }],
+      },
+    });
+
+    if (!sohbet)
+      return res.status(403).json({ mesaj: "Bu sohbete erişiminiz yok." });
+
+    const mesajlar = await prisma.mesaj.findMany({
+      where: { sohbetId },
+      orderBy: { zaman: "asc" },
+    });
+
+    res.status(200).json({ mesajlar });
+  } catch (hata) {
+    next(hata);
+  }
+});
+
+// ✅ Mesajları okundu olarak işaretle (alıcı tarafından)
+router.put("/okundu/:sohbetId", authMiddleware, async (req, res, next) => {
+  try {
+    const sohbetIdRaw = req.params.sohbetId;
+    const sohbetId = Number(sohbetIdRaw);
+    const kullaniciId = req.kullanici.id;
+
+    if (!sohbetIdRaw || isNaN(sohbetId) || sohbetId <= 0) {
+      return res.status(400).json({ mesaj: "Geçersiz sohbet ID." });
+    }
+
+    await prisma.mesaj.updateMany({
+      where: {
+        sohbetId,
+        gondericiId: { not: kullaniciId },
+        okundu: false,
+      },
+      data: { okundu: true },
+    });
+
+    res.status(200).json({ mesaj: "Mesajlar okundu olarak işaretlendi" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ✅ Var olan bir sohbete yeni mesaj gönder (sohbetId ile)
+router.post("/sohbet/:sohbetId", authMiddleware, async (req, res, next) => {
+  try {
+    const sohbetIdRaw = req.params.sohbetId;
+    const sohbetId = Number(sohbetIdRaw);
+    const gondericiId = req.kullanici.id;
+    const { mesaj } = req.body;
+
+    if (!sohbetIdRaw || isNaN(sohbetId) || sohbetId <= 0) {
+      return res.status(400).json({ mesaj: "Geçersiz sohbet ID." });
+    }
+
+    const sohbet = await prisma.sohbet.findFirst({
+      where: {
+        id: sohbetId,
+        OR: [{ aliciId: gondericiId }, { saticiId: gondericiId }],
+      },
+    });
+
+    if (!sohbet)
+      return res.status(403).json({ mesaj: "Bu sohbete erişiminiz yok." });
+
+    const yeniMesaj = await prisma.mesaj.create({
+      data: {
+        sohbetId,
+        mesaj,
+        gondericiId,
+        okundu: false,
+      },
+    });
+
+    const gonderen = await prisma.kullanici.findUnique({
+      where: { id: gondericiId },
+    });
+
+    await prisma.bildirim.create({
+      data: {
+        mesaj: `${gonderen.kullaniciAdi} size bir mesaj gönderdi.`,
+        hedefId:
+          sohbet.saticiId === gondericiId ? sohbet.aliciId : sohbet.saticiId,
+      },
+    });
+
+    res.status(201).json({ mesaj: "Mesaj gönderildi ✅", veri: yeniMesaj });
+  } catch (err) {
+    next(err);
+  }
+});
+
+module.exports = router;

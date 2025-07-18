@@ -1,11 +1,10 @@
-// api/axiosInstance.js
-import axios from 'axios';
-import { API_URL } from '@env';
+import axios from "axios";
+import { api_url } from "../constants/api_url"; // ✅ env yerine sabit
 
 const axiosInstance = axios.create({
-  baseURL: API_URL, // .env'den alıyoruz artık
+  baseURL: `${api_url}/api`, // ✅ önemli kısım burası
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 5000,
 });

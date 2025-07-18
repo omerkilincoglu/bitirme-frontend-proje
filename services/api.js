@@ -26,7 +26,7 @@ export async function login(girisBilgisi, sifre) {
 
 export async function signup(kullaniciAdi, eposta, sifre) {
   try {
-    const res = await axiosInstance.post("/kullanici/kayit", {
+    const res = await axiosInstance.post(`${api_url}/api/kullanici/kayit`, {
       kullaniciAdi,
       eposta,
       sifre,

@@ -1,6 +1,7 @@
 // Güncellenmiş HomeScreen.js - Favori işlemleri entegre ve veritabanına kayıt garantili
 import React, { useEffect, useState, useContext, useRef } from "react";
 import {
+  SafeAreaView,
   View,
   Text,
   FlatList,
@@ -229,7 +230,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.topBar}>
@@ -308,7 +309,7 @@ export default function HomeScreen() {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

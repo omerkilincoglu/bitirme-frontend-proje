@@ -20,6 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+<<<<<<< HEAD
       "edgeToEdgeEnabled": true,
       "package": "com.engomer.secondhand"
     },
@@ -32,5 +33,12 @@
       }
     },
     "owner": "eng-omer"
+=======
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
   }
 }

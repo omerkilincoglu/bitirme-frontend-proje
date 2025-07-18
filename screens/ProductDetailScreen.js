@@ -10,10 +10,15 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+<<<<<<< HEAD
   Platform,
 } from "react-native";
 import axios from "axios";
 import { MapPin, Tag, TextAlignLeft } from "phosphor-react-native";
+=======
+} from "react-native";
+import axios from "axios";
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 import { Dimensions } from "react-native";
 import { AuthContext } from "../store/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,9 +27,13 @@ import {
   deleteFavorite,
   getFavorites,
 } from "../services/favoriteApi";
+<<<<<<< HEAD
 import * as Linking from "expo-linking";
 import colors from "../constants/colors";
 import { api_url } from "../constants/api_url";
+=======
+import colors from "../constants/colors";
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -43,7 +52,11 @@ export default function ProductDetailScreen({ navigation, route }) {
 
   const fetchProduct = async () => {
     try {
+<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/urun/${id}`);
+=======
+      const res = await axios.get(`http://10.7.85.158:3000/api/urun/${id}`);
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setProduct(res.data.urun);
     } catch (err) {
       Alert.alert("Hata", "Ürün detayları alınamadı.");
@@ -54,9 +67,16 @@ export default function ProductDetailScreen({ navigation, route }) {
 
   const fetchTalepDurumu = async () => {
     try {
+<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/talep/durum/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+=======
+      const res = await axios.get(
+        `http://10.7.85.158:3000/api/talep/durum/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setTalepDurumu(res.data.durum);
     } catch (err) {
       console.log("Talep durumu alınamadı:", err);
@@ -95,6 +115,7 @@ export default function ProductDetailScreen({ navigation, route }) {
     }
   };
 
+<<<<<<< HEAD
   const openInMaps = () => {
     const detay = product.tamAdres || "";
     const konum = product.konum || {};
@@ -119,6 +140,11 @@ export default function ProductDetailScreen({ navigation, route }) {
   const goToChat = async () => {
     try {
       const sohbetRes = await axios.get(`${api_url}/api/sohbet`, {
+=======
+  const goToChat = async () => {
+    try {
+      const sohbetRes = await axios.get(`http://10.7.85.158:3000/api/sohbet`, {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -200,9 +226,13 @@ export default function ProductDetailScreen({ navigation, route }) {
                 }}
               >
                 <Image
+<<<<<<< HEAD
                   source={{
                     uri: `${api_url}/uploads/${img}`,
                   }}
+=======
+                  source={{ uri: `http://10.7.85.158:3000/uploads/${img}` }}
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                   style={{ width: screenWidth, height: 300 }}
                   resizeMode="cover"
                 />
@@ -263,6 +293,7 @@ export default function ProductDetailScreen({ navigation, route }) {
             </>
           )}
         </View>
+<<<<<<< HEAD
         {/* Ürün Başlığı*/}
         <View style={styles.content}>
           <Text style={styles.title}>{product.baslik}</Text>
@@ -307,6 +338,43 @@ export default function ProductDetailScreen({ navigation, route }) {
               <Text style={styles.mapHint}>Haritada açmak için tıklayın</Text>
             </View>
           </TouchableOpacity>
+=======
+
+        <View style={styles.content}>
+          <Text style={styles.title}>{product.baslik}</Text>
+          <Text style={styles.price}>{product.fiyat} ₺</Text>
+          <Text style={styles.label}>Açıklama</Text>
+          <View style={styles.descBox}>
+            <Text style={styles.description}>{product.aciklama}</Text>
+          </View>
+          <View style={styles.sectionRow}>
+            <Ionicons name="pricetag" size={18} color={colors.gray} />
+            <Text style={styles.meta}>{product.kategori}</Text>
+          </View>
+          <View
+            style={[
+              styles.sectionRow,
+              { alignItems: "flex-start", marginTop: 12 },
+            ]}
+          >
+            <Ionicons name="location-outline" size={18} color={colors.gray} />
+            <View style={{ flex: 1, marginLeft: 6 }}>
+              <Text style={{ color: colors.primaryText, fontSize: 14 }}>
+                {product.tamAdres?.split(" - ")[1]?.trim() ||
+                  "Adres bulunamadı"}
+              </Text>
+              <Text
+                style={{
+                  color: colors.secondaryText,
+                  fontSize: 13,
+                  marginTop: 2,
+                }}
+              >
+                {product.konum.ilce} / {product.konum.il} / {product.konum.ulke}
+              </Text>
+            </View>
+          </View>
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
           {user?.id !== product?.satici?.id && (
             <View style={{ flexDirection: "row", marginTop: 16, gap: 8 }}>
@@ -332,7 +400,11 @@ export default function ProductDetailScreen({ navigation, route }) {
                 onPress={async () => {
                   try {
                     await axios.post(
+<<<<<<< HEAD
                       `${api_url}/api/talep`,
+=======
+                      `http://10.7.85.158:3000/api/talep`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                       {
                         urunId: product.id,
                         mesaj: "Satın almak istiyorum.",
@@ -378,12 +450,24 @@ export default function ProductDetailScreen({ navigation, route }) {
                 style={[styles.actionButton, { backgroundColor: "#f44336" }]}
                 onPress={async () => {
                   try {
+<<<<<<< HEAD
                     await axios.delete(`${api_url}/api/talep/${product.id}`, {
                       headers: { Authorization: `Bearer ${token}` },
                     });
                     Alert.alert(
                       "Talep İptal Edildi",
                       "Satın alma talebiniz başarıyla iptal edildi. 🗑"
+=======
+                    await axios.delete(
+                      `http://10.7.85.158:3000/api/talep/${product.id}`,
+                      {
+                        headers: { Authorization: `Bearer ${token}` },
+                      }
+                    );
+                    Alert.alert(
+                      "Talep İptal Edildi",
+                      "Satın alma talebiniz başarıyla iptal edildi. 🗑️"
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                     );
                     fetchTalepDurumu();
                   } catch (err) {
@@ -395,7 +479,11 @@ export default function ProductDetailScreen({ navigation, route }) {
                       err.response.data &&
                       err.response.data.mesaj
                     ) {
+<<<<<<< HEAD
                       mesaj = err.response.data.mesaj + " 🤷‍♂";
+=======
+                      mesaj = err.response.data.mesaj + " 🤷‍♂️";
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                     }
 
                     Alert.alert("Talep İptal Edilemedi", mesaj);
@@ -431,9 +519,13 @@ export default function ProductDetailScreen({ navigation, route }) {
             ).map((img, idx) => (
               <Image
                 key={idx}
+<<<<<<< HEAD
                 source={{
                   uri: `${api_url}/uploads/${img}`,
                 }}
+=======
+                source={{ uri: `http://10.7.85.158:3000/uploads/${img}` }}
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                 style={{ width: screenWidth, height: "100%" }}
                 resizeMode="contain"
               />
@@ -507,6 +599,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 6,
   },
+<<<<<<< HEAD
   infoBox: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -535,6 +628,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#3B82F6",
     marginTop: 4,
+=======
+  descBox: {
+    backgroundColor: "#f5f5f5",
+    padding: 12,
+    borderRadius: 10,
+  },
+  description: {
+    fontSize: 14,
+    color: colors.secondaryText,
+  },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  meta: {
+    fontSize: 14,
+    color: colors.dark,
+    marginLeft: 6,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
   },
   offerButton: {
     flex: 1,

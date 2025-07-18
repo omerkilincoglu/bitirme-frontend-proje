@@ -89,7 +89,11 @@ export default function ChatScreen({ route, navigation }) {
     const fetchUrun = async () => {
       try {
         const res = await axios.get(
+<<<<<<< HEAD
           `http://:3000/api/urun/${urunId}`
+=======
+          `http://10.7.85.158:3000/api/urun/${urunId}`
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         );
         setAktifUrun(res.data.urun);
       } catch (err) {
@@ -153,7 +157,11 @@ export default function ChatScreen({ route, navigation }) {
   const markMessagesAsRead = async () => {
     try {
       await axios.put(
+<<<<<<< HEAD
         `http://:3000/api/mesaj/okundu/${sohbetId}`,
+=======
+        `http://10.7.85.158:3000/api/mesaj/okundu/${sohbetId}`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -221,7 +229,11 @@ export default function ChatScreen({ route, navigation }) {
             <View style={styles.productCard}>
               <Image
                 source={{
+<<<<<<< HEAD
                   uri: `http://:3000/uploads/${item.urun.resim}`,
+=======
+                  uri: `http://10.7.85.158:3000/uploads/${item.urun.resim}`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                 }}
                 style={styles.productImage}
               />
@@ -269,7 +281,11 @@ export default function ChatScreen({ route, navigation }) {
             <View style={styles.aktifUrunContainer}>
               <Image
                 source={{
+<<<<<<< HEAD
                   uri: `http://:3000/uploads/${aktifUrun.resim}`,
+=======
+                  uri: `http://10.7.85.158:3000/uploads/${aktifUrun.resim}`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                 }}
                 style={styles.aktifUrunImage}
               />
@@ -507,7 +523,11 @@ export default function ProductDetailScreen({ navigation, route }) {
 
   const fetchProduct = async () => {
     try {
+<<<<<<< HEAD
       const res = await axios.get(`http://:3000/api/urun/${id}`);
+=======
+      const res = await axios.get(`http://10.7.85.158:3000/api/urun/${id}`);
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setProduct(res.data.urun);
     } catch (err) {
       Alert.alert("Hata", "Ürün detay hatası");
@@ -544,7 +564,11 @@ export default function ProductDetailScreen({ navigation, route }) {
 
     const checkIfChatHasMessage = async () => {
     try {
+<<<<<<< HEAD
       const sohbetRes = await axios.get(`http://:3000/api/sohbet`, {
+=======
+      const sohbetRes = await axios.get(`http://10.7.85.158:3000/api/sohbet`, {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -563,7 +587,11 @@ export default function ProductDetailScreen({ navigation, route }) {
   };
   const goToChat = async () => {
     try {
+<<<<<<< HEAD
       const sohbetRes = await axios.get(`http://:3000/api/sohbet`, {
+=======
+      const sohbetRes = await axios.get(`http://10.7.85.158:3000/api/sohbet`, {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -618,7 +646,11 @@ export default function ProductDetailScreen({ navigation, route }) {
           <TouchableOpacity onPress={() => setImageModalVisible(true)}>
             <Image
               source={{
+<<<<<<< HEAD
                 uri: `http://:3000/uploads/${product.resim}`,
+=======
+                uri: `http://10.7.85.158:3000/uploads/${product.resim}`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
               }}
               style={styles.image}
             />
@@ -699,7 +731,11 @@ export default function ProductDetailScreen({ navigation, route }) {
             <Ionicons name="close-circle" size={36} color="white" />
           </TouchableOpacity>
           <Image
+<<<<<<< HEAD
             source={{ uri: `http://:3000/uploads/${product.resim}` }}
+=======
+            source={{ uri: `http://10.7.85.158:3000/uploads/${product.resim}` }}
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
             style={styles.fullImage}
             resizeMode="contain"
           />
@@ -827,7 +863,11 @@ const styles = StyleSheet.create({
 // 📄 messageApi.js
 import axios from "axios";
 
+<<<<<<< HEAD
 const API_URL = "http://:3000/api";
+=======
+const API_URL = "http://10.7.85.158:3000/api";
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 /**
  * 📨 Belirli sohbetin mesajlarını getirir

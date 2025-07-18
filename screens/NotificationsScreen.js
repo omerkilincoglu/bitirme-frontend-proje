@@ -15,7 +15,10 @@ import axios from "axios";
 import colors from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import EmptyState from "../components/EmptyState";
+<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
+=======
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function NotificationsScreen({ navigation }) {
   const { token } = useContext(AuthContext);
@@ -28,7 +31,11 @@ export default function NotificationsScreen({ navigation }) {
     setLoading(true);
     setBildirimler([]);
     try {
+<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/bildirim`, {
+=======
+      const res = await axios.get("http://10.7.85.158:3000/api/bildirim", {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -63,7 +70,11 @@ export default function NotificationsScreen({ navigation }) {
   const isaretleOkunduHepsi = async () => {
     try {
       await axios.put(
+<<<<<<< HEAD
         `${api_url}/api/bildirim/tumunu-okundu`,
+=======
+        "http://10.7.85.158:3000/api/bildirim/tumunu-okundu",
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -76,7 +87,11 @@ export default function NotificationsScreen({ navigation }) {
 
   const bildirimSil = async (id) => {
     try {
+<<<<<<< HEAD
       await axios.delete(`${api_url}/api/bildirim/${id}`, {
+=======
+      await axios.delete(`http://10.7.85.158:3000/api/bildirim/${id}`, {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchBildirimler();
@@ -96,7 +111,11 @@ export default function NotificationsScreen({ navigation }) {
   const topluSil = async () => {
     try {
       await axios.post(
+<<<<<<< HEAD
         `${api_url}/api/bildirim/toplu-sil`,
+=======
+        "http://10.7.85.158:3000/api/bildirim/toplu-sil",
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         { ids: seciliBildirimler },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -122,7 +141,11 @@ export default function NotificationsScreen({ navigation }) {
           try {
             const ids = bildirimler.map((b) => b.id);
             await axios.post(
+<<<<<<< HEAD
               `${api_url}/api/bildirim/toplu-sil`,
+=======
+              "http://10.7.85.158:3000/api/bildirim/toplu-sil",
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
               { ids },
               {
                 headers: { Authorization: `Bearer ${token}` },

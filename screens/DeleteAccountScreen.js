@@ -12,7 +12,11 @@ import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../store/AuthContext";
 import colors from "../constants/colors";
+<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
+=======
+
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 export default function DeleteAccountScreen({ navigation }) {
   const [sifre, setSifre] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +43,11 @@ export default function DeleteAccountScreen({ navigation }) {
 
               await axios({
                 method: "delete",
+<<<<<<< HEAD
                 url: `${api_url}/api/kullanici/hesap-sil`,
+=======
+                url: "http://10.7.85.158:3000/api/kullanici/hesap-sil",
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                 data: { sifre },
                 headers: { Authorization: `Bearer ${token}` },
               });

@@ -11,7 +11,10 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from "../constants/colors";
+<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
+=======
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function UpdateEmailScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -28,7 +31,11 @@ export default function UpdateEmailScreen({ navigation }) {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
       const res = await axios.put(
+<<<<<<< HEAD
         `${api_url}/api/kullanici/eposta`,
+=======
+        "http://10.7.85.158:3000/api/kullanici/eposta",
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         { epostaYeni: email, sifre: password },
         {
           headers: {

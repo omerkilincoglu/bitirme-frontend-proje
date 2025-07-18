@@ -19,7 +19,10 @@ import { getActiveListings } from "../services/productApi";
 import { AuthContext } from "../store/AuthContext";
 import colors from "../constants/colors";
 import EmptyState from "../components/EmptyState";
+<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
+=======
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function CartScreen() {
   const { token } = useContext(AuthContext);
@@ -67,7 +70,11 @@ export default function CartScreen() {
         <View style={styles.row}>
           <Image
             source={{
+<<<<<<< HEAD
               uri: `${api_url}/uploads/${item.urun?.resim}`,
+=======
+              uri: `http://10.7.85.158:3000/uploads/${item.urun?.resim}`,
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
             }}
             style={styles.imageThumb}
           />
@@ -107,7 +114,11 @@ export default function CartScreen() {
       <View style={styles.item}>
         <View style={styles.row}>
           <Image
+<<<<<<< HEAD
             source={{ uri: `${api_url}/uploads/${item.resim}` }}
+=======
+            source={{ uri: `http://10.7.85.158:3000/uploads/${item.resim}` }}
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
             style={styles.imageThumb}
           />
           <View style={{ flex: 1, marginLeft: 10 }}>

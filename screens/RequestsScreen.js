@@ -15,7 +15,10 @@ import axios from "axios";
 import colors from "../constants/colors";
 import EmptyState from "../components/EmptyState";
 import { Ionicons } from "@expo/vector-icons";
+<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
+=======
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function RequestsScreen({ route }) {
   const { token } = useContext(AuthContext);
@@ -30,7 +33,11 @@ export default function RequestsScreen({ route }) {
   const fetchRequests = async () => {
     try {
       setLoading(true);
+<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/talep/${id}`, {
+=======
+      const res = await axios.get(`http://10.7.85.158:3000/api/talep/${id}`, {
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
       setRequests(res.data.data || []);
@@ -43,7 +50,11 @@ export default function RequestsScreen({ route }) {
 
   const handleRequestAction = async (urunId, action) => {
     try {
+<<<<<<< HEAD
       const url = `${api_url}/api/talep/${action}/${urunId}`;
+=======
+      const url = `http://10.7.85.158:3000/api/talep/${action}/${urunId}`;
+>>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       await axios.put(
         url,
         {},

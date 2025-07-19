@@ -11,10 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function ProfileDetailScreen() {
   const [user, setUser] = useState(null);
@@ -23,22 +20,11 @@ export default function ProfileDetailScreen() {
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/kullanici/profil`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-=======
-      const res = await axios.get(
-        "http://10.7.85.158:3000/api/kullanici/profil",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setUser(res.data.kullanici);
     } catch (err) {
       Alert.alert("Hata", "Profil bilgileri alınamadı.");

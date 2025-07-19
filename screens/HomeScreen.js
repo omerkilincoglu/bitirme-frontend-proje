@@ -1,10 +1,7 @@
 // Güncellenmiş HomeScreen.js - Favori işlemleri entegre ve veritabanına kayıt garantili
 import React, { useEffect, useState, useContext, useRef } from "react";
 import {
-<<<<<<< HEAD
   SafeAreaView,
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
   View,
   Text,
   FlatList,
@@ -35,10 +32,7 @@ import {
   deleteFavorite,
 } from "../services/favoriteApi";
 import colors from "../constants/colors";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -119,18 +113,9 @@ export default function HomeScreen() {
   const fetchBildirimSayisi = async () => {
     if (!token) return; // token yoksa çalıştırma
     try {
-<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/bildirim/sayac`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-=======
-      const res = await axios.get(
-        "http://10.7.85.158:3000/api/bildirim/sayac",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setBildirimSayisi(res.data.okunmamisSayisi);
     } catch (err) {
       console.log("Bildirim sayısı alınamadı:", err);
@@ -197,11 +182,7 @@ export default function HomeScreen() {
     useCallback(() => {
       const fetchSohbetler = async () => {
         try {
-<<<<<<< HEAD
           const res = await axios.get(`${api_url}/api/sohbet`, {
-=======
-          const res = await axios.get("http://10.7.85.158:3000/api/sohbet", {
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
             headers: { Authorization: `Bearer ${token}` },
           });
           setSohbetler(res.data.sohbetler || []);
@@ -223,11 +204,7 @@ export default function HomeScreen() {
         onPress={() => navigation.navigate("ProductDetail", { id: item.id })}
       >
         <Image
-<<<<<<< HEAD
           source={{ uri: `${api_url}/uploads/${item.resim}` }}
-=======
-          source={{ uri: `http://10.7.85.158:3000/uploads/${item.resim}` }}
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
           style={styles.image}
         />
       </TouchableOpacity>
@@ -253,11 +230,7 @@ export default function HomeScreen() {
   );
 
   return (
-<<<<<<< HEAD
     <SafeAreaView style={styles.container}>
-=======
-    <View style={styles.container}>
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.topBar}>
@@ -336,11 +309,7 @@ export default function HomeScreen() {
           }
         />
       )}
-<<<<<<< HEAD
     </SafeAreaView>
-=======
-    </View>
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
   );
 }
 

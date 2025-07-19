@@ -9,11 +9,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
 
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 import { useNavigation, useRoute } from "@react-navigation/native";
 import colors from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -47,11 +44,7 @@ export default function FilterResultScreen() {
       onPress={() => navigation.navigate("ProductDetail", { id: item.id })}
     >
       <Image
-<<<<<<< HEAD
         source={{ uri: `${api_url}/uploads/${item.resim}` }}
-=======
-        source={{ uri: `http://10.7.85.158:3000/uploads/${item.resim}` }}
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         style={styles.image}
       />
       <View style={styles.info}>

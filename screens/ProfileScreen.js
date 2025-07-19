@@ -12,10 +12,7 @@ import colors from "../constants/colors";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 const LANGUAGES = [
   { code: "tr", flag: "🇹🇷" },
@@ -51,18 +48,9 @@ export default function ProfileScreen() {
         try {
           const token = await AsyncStorage.getItem("token");
 
-<<<<<<< HEAD
           const res = await axios.get(`${api_url}/api/kullanici/profil`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-=======
-          const res = await axios.get(
-            "http://10.7.85.158:3000/api/kullanici/profil",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
           setUser(res.data.kullanici);
         } catch (err) {
           console.log(

@@ -11,10 +11,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function UpdateUsernameScreen({ navigation }) {
   const [kullaniciAdi, setKullaniciAdi] = useState("");
@@ -31,11 +28,7 @@ export default function UpdateUsernameScreen({ navigation }) {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
       const res = await axios.put(
-<<<<<<< HEAD
         `${api_url}/api/kullanici/kullanici-adi`,
-=======
-        "http://10.7.85.158:3000/api/kullanici/kullanici-adi",
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         { kullaniciAdiYeni: kullaniciAdi, sifre },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -16,10 +16,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import EmptyState from "../components/EmptyState";
 import colors from "../constants/colors";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function ChatListScreen({ navigation }) {
   const { token, user } = useContext(AuthContext);
@@ -30,11 +27,7 @@ export default function ChatListScreen({ navigation }) {
 
   const fetchChats = async () => {
     try {
-<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/sohbet`, {
-=======
-      const res = await axios.get("http://10.7.85.158:3000/api/sohbet", {
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: { Authorization: `Bearer ${token}` },
       });
       setSohbetler(res.data.sohbetler || []);
@@ -101,11 +94,7 @@ export default function ChatListScreen({ navigation }) {
           try {
             await Promise.all(
               selectedChats.map((chatId) =>
-<<<<<<< HEAD
                 axios.delete(`${api_url}/api/sohbet/${chatId}`, {
-=======
-                axios.delete(`http://10.7.85.158:3000/api/sohbet/${chatId}`, {
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                   headers: { Authorization: `Bearer ${token}` },
                 })
               )

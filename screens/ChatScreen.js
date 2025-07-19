@@ -29,10 +29,7 @@ import {
 import axios from "axios";
 import colors from "../constants/colors";
 import EmptyState from "../components/EmptyState";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 // Hazır mesajları satırlara bölen yardımcı fonksiyon
 function chunkArray(array, size) {
@@ -92,13 +89,7 @@ export default function ChatScreen({ route, navigation }) {
   useEffect(() => {
     const fetchUrun = async () => {
       try {
-<<<<<<< HEAD
         const res = await axios.get(`${api_url}/api/urun/${urunId}`);
-=======
-        const res = await axios.get(
-          `http://10.7.85.158:3000/api/urun/${urunId}`
-        );
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         setAktifUrun(res.data.urun);
       } catch (err) {
         console.log("Ürün bilgisi alınamadı:", err);
@@ -161,11 +152,7 @@ export default function ChatScreen({ route, navigation }) {
   const markMessagesAsRead = async () => {
     try {
       await axios.put(
-<<<<<<< HEAD
         `${api_url}/api/mesaj/okundu/${sohbetId}`,
-=======
-        `http://10.7.85.158:3000/api/mesaj/okundu/${sohbetId}`,
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -210,7 +197,6 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   const renderMessage = ({ item, index }) => {
-<<<<<<< HEAD
     const isMine = item.gondericiId === user.id;
     const isFirstForThisProduct =
       messages.findIndex((msg) => msg.urunId === item.urunId) === index;
@@ -269,66 +255,6 @@ export default function ChatScreen({ route, navigation }) {
       </View>
     );
   };
-=======
-  const isMine = item.gondericiId === user.id;
-  const isFirstForThisProduct =
-    messages.findIndex((msg) => msg.urunId === item.urunId) === index;
-
-  return (
-    <View
-      style={[
-        styles.messageWrapper,
-        isMine ? styles.alignRight : styles.alignLeft,
-      ]}
-    >
-      <View
-        style={[
-          styles.messageBubble,
-          isMine ? styles.myMessage : styles.theirMessage,
-        ]}
-      >
-        {/* ÜRÜN KARTI ÜZERİNDEN ÜRÜN DETAYINA GİTME */}
-        {item.urun && isFirstForThisProduct && (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("ProductDetail", { id: item.urun.id })
-            }
-          >
-            <View style={styles.productCard}>
-              <Image
-                source={{
-                  uri: `http://10.7.85.158:3000/uploads/${item.urun.resim}`,
-                }}
-                style={styles.productImage}
-              />
-              <View style={{ marginLeft: 8 }}>
-                <Text style={styles.productTitle}>{item.urun.baslik}</Text>
-                <Text style={styles.productPrice}>{item.urun.fiyat} ₺</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-
-        <Text style={styles.messageText}>{item.mesaj}</Text>
-
-        <View style={styles.metaInfo}>
-          <Text style={styles.timeText}>
-            {item.zaman ? item.zaman.slice(11, 16) : ""}
-          </Text>
-          {isMine && (
-            <Ionicons
-              name={item.okundu ? "checkmark-done" : "checkmark"}
-              size={14}
-              color={item.okundu ? "#4CAF50" : "#999"}
-              style={{ marginLeft: 6 }}
-            />
-          )}
-        </View>
-      </View>
-    </View>
-  );
-};
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
   return (
     <KeyboardAvoidingView
@@ -347,11 +273,7 @@ export default function ChatScreen({ route, navigation }) {
             <View style={styles.aktifUrunContainer}>
               <Image
                 source={{
-<<<<<<< HEAD
                   uri: `${api_url}/uploads/${aktifUrun.resim}`,
-=======
-                  uri: `http://10.7.85.158:3000/uploads/${aktifUrun.resim}`,
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
                 }}
                 style={styles.aktifUrunImage}
               />

@@ -15,11 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import colors from "../constants/colors";
 import EmptyState from "../components/EmptyState";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
-
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 export default function FavoritesScreen({ navigation }) {
   const { token } = useContext(AuthContext);
   const [favorites, setFavorites] = useState([]);
@@ -62,11 +58,7 @@ export default function FavoritesScreen({ navigation }) {
         }
       >
         <Image
-<<<<<<< HEAD
           source={{ uri: `${api_url}/uploads/${item.urun.resim}` }}
-=======
-          source={{ uri: `http://10.7.85.158:3000/uploads/${item.urun.resim}` }}
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
           style={styles.image}
         />
         <View style={styles.infoBox}>

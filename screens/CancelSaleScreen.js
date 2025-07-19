@@ -14,10 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../store/AuthContext";
 import colors from "../constants/colors";
 import { cancelSale } from "../services/productApi";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 export default function CancelSaleScreen({ route, navigation }) {
   const { id } = route.params;
@@ -27,11 +24,7 @@ export default function CancelSaleScreen({ route, navigation }) {
 
   const fetchProduct = async () => {
     try {
-<<<<<<< HEAD
       const res = await axios.get(`${api_url}/api/urun/${id}`);
-=======
-      const res = await axios.get(`http://10.7.85.158:3000/api/urun/${id}`);
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
       setProduct(res.data.urun);
     } catch (err) {
       Alert.alert("Hata", "Ürün bilgisi alınamadı.");
@@ -69,11 +62,7 @@ export default function CancelSaleScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Image
-<<<<<<< HEAD
         source={{ uri: `${api_url}/uploads/${product.resim}` }}
-=======
-        source={{ uri: `http://10.7.85.158:3000/uploads/${product.resim}` }}
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         style={styles.image}
       />
       <Text style={styles.title}>{product.baslik}</Text>

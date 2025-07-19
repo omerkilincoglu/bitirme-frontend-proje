@@ -1,13 +1,8 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
 
 const API_URL = `${api_url}/api/favori`;
-=======
-
-const API_URL = "http://10.7.85.158:3000/api/favori";
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
 const getAuthHeader = async () => {
   const token = await AsyncStorage.getItem("token");

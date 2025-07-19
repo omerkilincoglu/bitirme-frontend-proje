@@ -26,11 +26,7 @@ import {
 } from "@react-navigation/native";
 import axios from "axios";
 import colors from "../constants/colors";
-<<<<<<< HEAD
 import { api_url } from "../constants/api_url";
-=======
-
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 const KATEGORILER = [
   "Ev Eşyaları",
   "Elektronik",
@@ -85,11 +81,7 @@ export default function EditProductScreen() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-<<<<<<< HEAD
         const res = await axios.get(`${api_url}/api/urun/${id}`);
-=======
-        const res = await axios.get(`http://10.7.85.158:3000/api/urun/${id}`);
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         const urun = res.data.urun;
         setBaslik(urun.baslik);
         setAciklama(urun.aciklama);
@@ -99,11 +91,7 @@ export default function EditProductScreen() {
         setIl(urun.konum.il);
         setIlce(urun.konum.ilce);
         setUlke(urun.konum.ulke);
-<<<<<<< HEAD
         setImage(`${api_url}/uploads/${urun.resim}`);
-=======
-        setImage(`http://10.7.85.158:3000/uploads/${urun.resim}`);
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
 
         // ✅ tamAdres'ten detaylı kısmı ayır
         if (urun.tamAdres) {
@@ -218,11 +206,7 @@ export default function EditProductScreen() {
         });
       }
 
-<<<<<<< HEAD
       await axios.put(`${api_url}/api/urun/${id}`, formData, {
-=======
-      await axios.put(`http://10.7.85.158:3000/api/urun/${id}`, formData, {
->>>>>>> f4c47392e4a2687f55dcc9ef902610ef1a3bdc01
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

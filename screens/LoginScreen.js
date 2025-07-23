@@ -40,6 +40,7 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Kullanıcı Adı / E-posta"
+        placeholderTextColor="#888888"
         value={usernameOrEmail}
         onChangeText={setUsernameOrEmail}
       />
@@ -48,6 +49,7 @@ export default function LoginScreen({ navigation }) {
         <TextInput
           style={styles.passwordInput}
           placeholder="Şifre"
+          placeholderTextColor="#888888"
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: colors.gray,
+    color: "black",
   },
   passwordContainer: {
     flexDirection: "row",
@@ -110,6 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     paddingVertical: 14,
+    color: "black",
   },
   primaryButton: {
     backgroundColor: colors.primary,

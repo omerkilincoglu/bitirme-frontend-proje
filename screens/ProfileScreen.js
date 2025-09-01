@@ -5,13 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  StatusBar,
 } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import colors from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../store/AuthContext";
-import colors from "../constants/colors";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { api_url } from "../constants/api_url";
 
 const LANGUAGES = [
@@ -22,6 +24,7 @@ const LANGUAGES = [
 
 export default function ProfileScreen() {
   const { user, setUser, logout } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [selectedLang, setSelectedLang] = useState("tr");
   const [showLangs, setShowLangs] = useState(false);
@@ -64,7 +67,7 @@ export default function ProfileScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <TouchableOpacity
@@ -74,6 +77,7 @@ export default function ProfileScreen() {
             <Ionicons name="arrow-back" size={24} color={colors.dark} />
             <Text style={styles.headerTitle}>Hesabım</Text>
           </TouchableOpacity>
+          {/* ---Dilleri ekledikten sonra tekrar aktifleştimrek---
 
           <View style={styles.languageContainer}>
             {showLangs ? (
@@ -100,6 +104,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             )}
           </View>
+          */}
         </View>
 
         <View style={styles.avatarContainer}>

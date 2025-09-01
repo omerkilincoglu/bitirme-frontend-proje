@@ -1,7 +1,6 @@
 // Güncellenmiş HomeScreen.js - Favori işlemleri entegre ve veritabanına kayıt garantili
 import React, { useEffect, useState, useContext, useRef } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   FlatList,
@@ -15,6 +14,7 @@ import {
   StatusBar,
   Alert,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import axios from "axios";
 import {
   useNavigation,
@@ -37,6 +37,7 @@ import { api_url } from "../constants/api_url";
 export default function HomeScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const insets = useSafeAreaInsets();
   const { logout, token } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -230,7 +231,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.topBar}>
@@ -309,13 +310,13 @@ export default function HomeScreen() {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  topBar: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
+  topBar: { paddingHorizontal: 16, paddingBottom: 8 },
   topRow: { flexDirection: "row", alignItems: "center" },
   searchContainer: {
     flex: 1,

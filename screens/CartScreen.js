@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  StatusBar,
 } from "react-native";
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,6 +24,7 @@ import { api_url } from "../constants/api_url";
 
 export default function CartScreen() {
   const { token } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState("purchases");
   const [purchases, setPurchases] = useState([]);
@@ -152,7 +154,8 @@ export default function CartScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={styles.tabBar}>
         <TouchableOpacity
           onPress={() => setActiveTab("purchases")}
@@ -203,7 +206,6 @@ export default function CartScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -249,12 +251,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF3E9",
-    padding: 16,
   },
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 16,
+    backgroundColor: "#FF8C00",
+    paddingVertical: 6,
+    marginTop: 10,
+    width: "100%",
   },
   tabButton: {
     flex: 1,
